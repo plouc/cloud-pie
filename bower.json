@@ -1,0 +1,15 @@
+{
+  "name": "kumo-no-naka",
+  "description": "kumo-no-naka",
+  "version": "0.0.1",
+  "private": false,
+  "author": "Raphaël Benitte",
+  "dependencies": {
+      "angular": "1.2.x",
+      "angular-route": "1.2.x",
+      "restangular": "~1.4.0",
+      "lodash": "2.4.x"
+  },
+  "devDependencies": {
+  }
+}

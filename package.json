@@ -1,0 +1,24 @@
+{
+  "name": "kumo-no-naka",
+  "description": "Tool to vizualize your cloud infrastructure",
+  "version": "0.0.1",
+  "private": true,
+  "author": "Raphaël Benitte",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plouc/kumo-no-naka.git"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x"
+  },
+  "dependencies": {
+    "body-parser": "^1.3.0",
+    "method-override": "^2.0.2",
+    "aws-sdk": "^2.0.4",
+    "lodash": "^2.4.1",
+    "bluebird": "^2.1.3",
+    "request": "^2.37.0",
+    "express": "4.x"
+  }
+}
