@@ -54,16 +54,6 @@ module.exports.fetch = function () {
             data.SecurityGroups.forEach(function (securityGroup) {
                 securityGroups.push(securityGroup);
             });
-            /*
-            Description: "Search LB dev"
-            GroupId: "sg-b0dc0ed5"
-            GroupName: "SG-CPL-ADM-SEARCH-DEV-LB"
-            IpPermissions: Array[3]
-            IpPermissionsEgress: Array[1]
-            OwnerId: "167012524447"
-            Tags: Array[1]
-            VpcId: "vpc-ef53ba8a"
-            */
 
             securityGroupsDef.resolve(securityGroups);
         }
