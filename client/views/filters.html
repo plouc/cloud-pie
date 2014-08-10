@@ -3,10 +3,14 @@
         <fa name="filter" ng-class="{ '_is-active': filters.vpcs.filter, '_is-disabled': !filters.vpcs.filter }"></fa>VPCs
     </div>
     <ul class="site-header__drop-down__list">
-        <li>
+        <li class="filters__switch">
             <div class="button-group full-width">
-                <span class="button" data-ng-click="filters.vpcs.filter = true; refreshFilters();">on</span>
-                <span class="button" data-ng-click="filters.vpcs.filter = false; refreshFilters();">off</span>
+                <span class="button"
+                      ng-click="filters.vpcs.filter = true; refreshFilters();"
+                      ng-class="{ '_is-active': filters.vpcs.filter }">on</span>
+                <span class="button"
+                      ng-click="filters.vpcs.filter = false; refreshFilters();"
+                      ng-class="{ '_is-active': !filters.vpcs.filter }">off</span>
             </div>
         </li>
         <li data-ng-repeat="(vpcId, vpc) in filters.vpcs.ids"
@@ -22,10 +26,14 @@
         <fa name="filter" ng-class="{ '_is-active': filters.tags.filter, '_is-disabled': !filters.tags.filter }"></fa>instance tags
     </div>
     <ul class="site-header__drop-down__list">
-        <li>
+        <li class="filters__switch">
             <div class="button-group full-width">
-                <span class="button" data-ng-click="filters.tags.filter = true; refreshFilters();">on</span>
-                <span class="button" data-ng-click="filters.tags.filter = false; refreshFilters();">off</span>
+                <span class="button"
+                      ng-click="filters.tags.filter = true; refreshFilters();"
+                      ng-class="{ '_is-active': filters.tags.filter }">on</span>
+                <span class="button"
+                      ng-click="filters.tags.filter = false; refreshFilters();"
+                      ng-class="{ '_is-active': !filters.tags.filter }">off</span>
             </div>
         </li>
         <li data-ng-repeat="(tag, tagConfig) in filters.tags.tags"

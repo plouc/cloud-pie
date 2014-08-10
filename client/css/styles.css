@@ -10,8 +10,8 @@ body {
 }
 
 .site-header {
-    background-color: #333;
-    color: #ddd;
+    background-color: #273e45;
+    color: #d4e3c9;
     padding: 0 20px;
     position: fixed;
     top: 0;
@@ -23,6 +23,7 @@ body {
 }
 .site-header h1 {
     margin: 0;
+    color: #e9e5cd;
     font-family: "Montserrat", "sans-serif";
     font-weight: 700;
     float: left;
@@ -43,18 +44,17 @@ body {
     line-height: 46px;
     padding: 0 15px 0 12px;
     cursor: pointer;
-    border-right: 1px solid #000000;
+    border-right: 1px solid #1b2f36;
 }
 .filters .site-header__drop-down:first-child {
-    border-left: 1px solid #000000;
+    border-left: 1px solid #1b2f36;
 }
 .site-header__drop-down__title:hover {
-    background-color: #555;
+    background-color: #324d54;
 }
 .site-header__drop-down__list {
     display: none;
-    background-color: #fff;
-    color: #555;
+    background-color: #273e45;
     border-top: none;
     z-index: 9999;
     margin: 0;
@@ -76,7 +76,7 @@ body {
     left: 100%;
     display: none;
     list-style: none;
-    background-color: #fff;
+    background-color: #273e45;
     box-shadow: 0 0 2px rgba(0,0,0,.2);
     margin: 0;
     padding: 3px 0;
@@ -88,7 +88,7 @@ body {
     position: relative;
 }
 .site-header__drop-down__list__item:hover {
-    background-color: #eee;
+    background-color: #324d54;
 }
 .site-header__drop-down__list__item:hover .site-header__drop-down__list__sub {
     display: block;
@@ -185,7 +185,7 @@ body {
     margin-right: 10px;
 }
 .fa-filter._is-disabled {
-    color: #666;
+    color: #286169;
 }
 .fa-filter._is-active {
     color: #c9dfb9;
@@ -201,7 +201,7 @@ body {
     width: 100%;
 }
 .button {
-    padding: 5px 7px;
+    padding: 7px 9px;
     text-align: center;
     border-radius: 2px;
     display: inline-block;
@@ -220,4 +220,16 @@ body {
 }
 .button-group.full-width .button:last-child {
     border-radius: 0 3px 3px 0;
+}
+
+.filters__switch {
+    padding: 5px 10px;
+    text-align: center;
+}
+.filters__switch .button {
+    border-color: #15232b;
+    background-color: #2e4a51;
+}
+.filters__switch .button._is-active {
+    background-color: #496e75;
 }
