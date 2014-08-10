@@ -1,4 +1,4 @@
-angular.module('kumononaka').factory('StackService', [
+angular.module('cloudpie').factory('StackService', [
     'Restangular',
     function (
         Restangular
@@ -9,7 +9,11 @@ angular.module('kumononaka').factory('StackService', [
 
         return {
             get: function () {
-                return stack.customGET('');
+                return stack.customGET('')
+                    .then(function (stack) {
+                        return Restangular.stripRestangular(stack);
+                    })
+                ;
             }
         };
     }

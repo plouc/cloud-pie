@@ -1,6 +1,7 @@
-angular.module('kumononaka', [
+angular.module('cloudpie', [
         'ngRoute',
-        'restangular'
+        'restangular',
+        'picardy.fontawesome'
     ])
     .config(['RestangularProvider', function (RestangularProvider) {
         RestangularProvider.setBaseUrl('/api/');

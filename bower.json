@@ -1,15 +1,16 @@
 {
-  "name": "kumo-no-naka",
-  "description": "kumo-no-naka",
+  "name": "cloud-pie",
+  "description": "cloud pie",
   "version": "0.0.1",
   "private": false,
   "author": "Raphaël Benitte",
   "dependencies": {
-      "angular": "1.2.x",
-      "angular-route": "1.2.x",
-      "restangular": "~1.4.0",
-      "lodash": "2.4.x"
+    "angular": "1.2.x",
+    "angular-route": "1.2.x",
+    "restangular": "~1.4.0",
+    "lodash": "~2.4.1",
+    "fontawesome": "~4.1.0",
+    "angular-fontawesome": "~0.1.2"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

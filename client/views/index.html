@@ -1,7 +1,71 @@
-<svg ng-attr-height="{{viz.height}}" ng-attr-width="{{viz.width}}">
-    <circle ng-repeat="instance in instances"
-            ng-attr-cx="{{circle.x}}"
-            ng-attr-cy="{{circle.y}}"
-            ng-attr-r= "{{circle.r}}">
-    </circle>
+<div class="site-header">
+    <h1>CLOUD PIE</h1>
+
+    <div class="filters" data-ng-include="'views/filters.html'"></div>
+</div>
+
+<svg class="workspace" height="3000" width="1400">
+
+    <rect ng-repeat="vpc in vpcs"
+          class="vpc"
+          rx="6" ry="6"
+          ng-attr-x="{{vpc.style.x}}"
+          ng-attr-y="{{vpc.style.y}}"
+          ng-attr-width="{{vpc.style.width}}"
+          ng-attr-height="{{vpc.style.height}}"
+          ng-class="{ '_is-visible': vpc.visible, '_is-hidden': !vpc.visible }"
+    />
+
+    <g ng-repeat="loadBalancer in loadBalancers"
+       ng-if="loadBalancer.instances.length"
+       ng-attr-transform="translate({{loadBalancer.style.x}},{{loadBalancer.style.y}})"
+       class="load-balancer"
+       ng-class="{ '_is-visible': loadBalancer.visible, '_is-hidden': !loadBalancer.visible }">
+        <rect class="load-balancer__area"
+            rx="5" ry="5"
+            ng-attr-width="{{loadBalancer.style.width}}"
+            ng-attr-height="{{loadBalancer.style.height}}" />
+        <circle r="12" ng-attr-cx="{{loadBalancer.style.width / 2}}"
+                class="load-balancer__icon"/>
+        <text class="load-balancer__icon-text"
+              ng-attr-x="{{loadBalancer.style.width / 2}}">LB</text>
+        <text class="load-balancer__name"
+              ng-attr-width="{{loadBalancer.width}}"
+              ng-attr-x="{{loadBalancer.style.width / 2}}"
+              ng-attr-y="-20">{{loadBalancer.name}}</text>
+    </g>
+
+    <g ng-repeat="instance in instances"
+       ng-attr-transform="translate({{instance.style.x}},{{instance.style.y}})">
+        <rect class="instance"
+              ng-class="{ '_is-visible': instance.visible, '_is-hidden': !instance.visible }"
+              rx="3" ry="3"
+              ng-attr-width="{{instance.style.width}}"
+              ng-attr-height="{{instance.style.height}}" />
+        <circle r="6"
+                ng-attr-cx="{{instance.style.width / 2}}"
+                cy="20"
+                class="instance__status instance__status-{{instance.state}}"/>
+        <text class="instance__name"
+              ng-attr-x="{{instance.style.width / 2}}"
+              ng-attr-y="{{instance.style.height / 2}}">{{instance.name}}</text>
+    </g>
 </svg>
+
+<!--
+<div class="workspace">
+    <div ng-repeat="vpc in vpcs" class="vpc" ng-style="vpc.style">
+        <div class="vpc-info">
+            <h2>{{ vpc.id }} {{ vpc.instances.length }} instance(s)</h2>
+        </div>
+    </div>
+
+    <div ng-repeat="loadBalancer in loadBalancers" class="load-balancer" ng-style="loadBalancer.style">
+        <h3>{{ loadBalancer.name }}</h3>
+    </div>
+
+    <div ng-repeat="instance in instances" class="instance" ng-style="instance.style">
+        <h3>{{ instance.name }}</h3>
+    </div>
+</div>
+-->

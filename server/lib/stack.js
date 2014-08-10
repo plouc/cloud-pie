@@ -5,18 +5,20 @@ var _       = require('lodash');
 AWS.config.region = 'eu-west-1';
 
 var ec2 = new AWS.EC2();
+var elb = new AWS.ELB();
 
 module.exports.fetch = function () {
 
-    var def   = Promise.defer();
-    var amis  = [];
+    var def             = Promise.defer();
+    var amis            = [];
+    var vpcsInstanceIds = {};
 
     var instancesDef = Promise.defer();
     ec2.describeInstances({}, function (err, data) {
         if (err) {
             instancesDef.reject(err);
         } else {
-            var instances = [];
+            var instances = {};
             data.Reservations.forEach(function (reservation) {
                 reservation.Instances.forEach(function (instanceData) {
                     var instance = {
@@ -24,7 +26,9 @@ module.exports.fetch = function () {
                         state:            instanceData.State.Name,
                         type:             instanceData.InstanceType,
                         privateIpAddress: instanceData.PrivateIpAddress,
-                        publicIpAddress:  instanceData.PublicIpAddress || null
+                        publicIpAddress:  instanceData.PublicIpAddress || null,
+                        vpc:              instanceData.VpcId,
+                        loadBalancers:    []
                     };
 
                     instance.tags = {};
@@ -34,9 +38,16 @@ module.exports.fetch = function () {
 
                     instance.name = instance.tags.name || null;
 
-                    instances.push(instance);
+                    instances[instance.id] = instance;
 
                     amis.push(instanceData.ImageId);
+
+                    if (typeof instance.vpc != 'undefined') {
+                        if (!vpcsInstanceIds[instance.vpc]) {
+                            vpcsInstanceIds[instance.vpc] = [];
+                        }
+                        vpcsInstanceIds[instance.vpc].push(instance.id);
+                    }
                 });
             });
 
@@ -59,19 +70,62 @@ module.exports.fetch = function () {
         }
     });
 
+    var loadBalancersDef = Promise.defer();
+    elb.describeLoadBalancers({}, function (err, data) {
+        if (err) {
+            loadBalancersDef.reject(err);
+        } else {
+            var loadBalancers = {};
+
+            data.LoadBalancerDescriptions.forEach(function (loadBalancerData) {
+                loadBalancers[loadBalancerData.LoadBalancerName] = {
+                    name:      loadBalancerData.LoadBalancerName,
+                    dns:       loadBalancerData.DNSName,
+                    vpc:       loadBalancerData.VPCId,
+                    createdAt: loadBalancerData.CreatedTime,
+                    instances: _.pluck(loadBalancerData.Instances, 'InstanceId')
+                };
+            });
+
+            loadBalancersDef.resolve(loadBalancers);
+        }
+    });
+
     Promise.props({
         instances:      instancesDef.promise,
-        securityGroups: securityGroupsDef.promise
+        securityGroups: securityGroupsDef.promise,
+        loadBalancers:  loadBalancersDef.promise
     })
         .then(function (props) {
             ec2.describeImages({
-                ImageIds: amis
+                ImageIds: _.uniq(amis)
             }, function (err, data) {
                 if (err) {
                     def.reject(err);
                 } else {
-                    var amis = [];
+                    _.forOwn(props.loadBalancers, function (loadBalancer) {
+                        loadBalancer.instances.forEach(function (instanceId) {
+                            if (props.instances[instanceId]) {
+                                props.instances[instanceId].loadBalancers.push(loadBalancer.name);
+                            }
+                        });
+                    });
 
+
+                    var allTags = {};
+                    _.forOwn(props.instances, function (instance) {
+                        _.forOwn(instance.tags, function (tagValue, tagKey) {
+                            if (!allTags[tagKey]) {
+                                allTags[tagKey] = [];
+                            }
+                            if (_.indexOf(allTags[tagKey], tagValue) === -1) {
+                                allTags[tagKey].push(tagValue);
+                            }
+                        });
+                    });
+                    props.tags = allTags;
+
+                    var amis = [];
                     data.Images.forEach(function (image) {
                         amis.push({
                             id:          image.ImageId,
@@ -79,10 +133,27 @@ module.exports.fetch = function () {
                             description: image.Description
                         });
                     });
-
                     props.amis = amis;
 
-                    def.resolve(props);
+                    props.vpcs = {};
+                    ec2.describeVpcs({
+                        VpcIds: _.keys(vpcsInstanceIds)
+                    }, function (err, data) {
+                        if (err) {
+                            def.reject(err);
+                        } else {
+                            data.Vpcs.forEach(function (vpcData) {
+                                props.vpcs[vpcData.VpcId] = {
+                                    id:        vpcData.VpcId,
+                                    state:     vpcData.State,
+                                    default:   vpcData.IsDefault,
+                                    cidrBlock: vpcData.CidrBlock,
+                                    instances: vpcsInstanceIds[vpcData.VpcId]
+                                };
+                            });
+                            def.resolve(props);
+                        }
+                    });
                 }
             });
         })

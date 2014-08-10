@@ -1,0 +1,223 @@
+body {
+    font-family: helvetica, arial;
+    font-size: 12px;
+    background-color: #eee;
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.site-header {
+    background-color: #333;
+    color: #ddd;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 46px;
+    line-height: 46px;
+    z-index: 9999;
+}
+.site-header h1 {
+    margin: 0;
+    font-family: "Montserrat", "sans-serif";
+    font-weight: 700;
+    float: left;
+}
+
+.filters {
+    float: left;
+    margin-left: 30px;
+}
+.site-header__drop-down {
+    display: inline-block;
+    position: relative;
+    height: 46px;
+    float: left;
+}
+.site-header__drop-down__title {
+    height: 46px;
+    line-height: 46px;
+    padding: 0 15px 0 12px;
+    cursor: pointer;
+    border-right: 1px solid #000000;
+}
+.filters .site-header__drop-down:first-child {
+    border-left: 1px solid #000000;
+}
+.site-header__drop-down__title:hover {
+    background-color: #555;
+}
+.site-header__drop-down__list {
+    display: none;
+    background-color: #fff;
+    color: #555;
+    border-top: none;
+    z-index: 9999;
+    margin: 0;
+    padding: 3px 0;
+    list-style: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    float: left;
+    min-width: 160px;
+    text-align: left;
+    box-shadow: 0 0 2px rgba(0,0,0,.2);
+    line-height: 1em;
+    border-radius: 0 0 3px 3px;
+}
+.site-header__drop-down__list__sub {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    display: none;
+    list-style: none;
+    background-color: #fff;
+    box-shadow: 0 0 2px rgba(0,0,0,.2);
+    margin: 0;
+    padding: 3px 0;
+}
+.site-header__drop-down:hover .site-header__drop-down__list {
+    display: block;
+}
+.site-header__drop-down__list__item {
+    position: relative;
+}
+.site-header__drop-down__list__item:hover {
+    background-color: #eee;
+}
+.site-header__drop-down__list__item:hover .site-header__drop-down__list__sub {
+    display: block;
+}
+.site-header__drop-down__list__item label {
+    display: block;
+    padding: 5px 10px;
+    cursor: pointer;
+    white-space: pre;
+}
+.site-header__drop-down__list__item input[type="checkbox"] {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.workspace {
+    margin: 20px;
+    margin-top: 100px;
+    position: relative;
+}
+
+.vpc {
+    fill: #e9e5cd;
+}
+.vpc._is-hidden {
+    fill: rgba(233, 229, 205, 0.40);
+}
+.vpc-info {
+    position: absolute;
+    top: -34px;
+    height: 32px;
+    background-color: #fa8217;
+    padding: 0 10px;
+    margin-left: 5px;
+    color: #FFF;
+    border-radius: 2px;
+}
+.vpc-info h2 {
+    margin: 0;
+    line-height: 32px;
+    font-weight: 400;
+    font-family: "Montserrat", "sans-serif";
+}
+
+
+.load-balancer__area {
+    fill: rgba(169, 223, 196, 0.3);
+    stroke: rgb(169, 223, 196);
+}
+.load-balancer._is-hidden .load-balancer__area {
+    fill: rgba(169, 223, 196, 0.1);
+    stroke: rgba(169, 223, 196, 0.3);
+}
+.load-balancer__icon {
+    fill: #273e45;
+}
+.load-balancer__icon-text {
+    fill: rgb(169, 223, 196);
+    font-size: 11px;
+    font-family: "Montserrat", "sans-serif";
+    font-weight: 700;
+    text-anchor: middle;
+    alignment-baseline: middle;
+}
+.load-balancer__name {
+    fill: #273e45;
+    font-family: "Montserrat", "sans-serif";
+    font-size: 11px;
+    text-anchor: middle;
+}
+
+
+.instance {
+    fill: rgba(255, 255, 255, 0.51);
+}
+.instance._is-hidden {
+    fill: rgba(255, 255, 255, 0.15);
+}
+.instance__name {
+    fill: #273e45;
+    font-size: 11px;
+    font-family: "Montserrat", "sans-serif";
+    text-anchor: middle;
+}
+.instance__status-running {
+    fill: #39bfa0;
+}
+.instance__status-stopped {
+    fill: #c64134;
+}
+
+
+.fa-filter {
+    margin-right: 10px;
+}
+.fa-filter._is-disabled {
+    color: #666;
+}
+.fa-filter._is-active {
+    color: #c9dfb9;
+}
+
+
+.button-group {
+
+}
+.button-group.full-width {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+.button {
+    padding: 5px 7px;
+    text-align: center;
+    border-radius: 2px;
+    display: inline-block;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+.button-group.full-width .button {
+    display: table-cell;
+    width: 1%;
+    border-radius: 0;
+    border-left-width: 0;
+}
+.button-group.full-width .button:first-child {
+    border-radius: 3px 0 0 3px;
+    border-left-width: 1px;
+}
+.button-group.full-width .button:last-child {
+    border-radius: 0 3px 3px 0;
+}

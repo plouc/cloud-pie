@@ -1,4 +1,4 @@
-angular.module('kumononaka')
+angular.module('cloudpie')
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.
             when('/', {

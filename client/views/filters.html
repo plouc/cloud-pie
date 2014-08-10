@@ -1,0 +1,43 @@
+<div class="site-header__drop-down">
+    <div class="site-header__drop-down__title">
+        <fa name="filter" ng-class="{ '_is-active': filters.vpcs.filter, '_is-disabled': !filters.vpcs.filter }"></fa>VPCs
+    </div>
+    <ul class="site-header__drop-down__list">
+        <li>
+            <div class="button-group full-width">
+                <span class="button" data-ng-click="filters.vpcs.filter = true; refreshFilters();">on</span>
+                <span class="button" data-ng-click="filters.vpcs.filter = false; refreshFilters();">off</span>
+            </div>
+        </li>
+        <li data-ng-repeat="(vpcId, vpc) in filters.vpcs.ids"
+            class="site-header__drop-down__list__item">
+            <label><input data-ng-model="vpc.enabled" data-ng-change="refreshFilters()"
+                          type="checkbox"/>{{vpcId}}</label>
+        </li>
+    </ul>
+</div>
+
+<div class="site-header__drop-down">
+    <div class="site-header__drop-down__title">
+        <fa name="filter" ng-class="{ '_is-active': filters.tags.filter, '_is-disabled': !filters.tags.filter }"></fa>instance tags
+    </div>
+    <ul class="site-header__drop-down__list">
+        <li>
+            <div class="button-group full-width">
+                <span class="button" data-ng-click="filters.tags.filter = true; refreshFilters();">on</span>
+                <span class="button" data-ng-click="filters.tags.filter = false; refreshFilters();">off</span>
+            </div>
+        </li>
+        <li data-ng-repeat="(tag, tagConfig) in filters.tags.tags"
+            class="site-header__drop-down__list__item">
+            <label><input type="checkbox" data-ng-change="refreshFilters()" data-ng-model="tagConfig.enabled"/>{{tag}}</label>
+
+            <ul class="site-header__drop-down__list__sub">
+                <li data-ng-repeat="tag in tagConfig.tags"
+                    class="site-header__drop-down__list__item">
+                    <label><input data-ng-model="tag.enabled" data-ng-change="refreshFilters()" type="checkbox"/>{{tag.value || 'null'}}</label>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
