@@ -8,7 +8,8 @@ body {
   box-sizing: border-box; }
 
 .vpc {
-  fill: #e9e5cd; }
+  fill: #e9e5cd;
+  stroke: #d8d4bd; }
   .vpc._is-hidden {
     fill: rgba(233, 229, 205, 0.4); }
 
@@ -50,7 +51,7 @@ body {
 .load-balancer__name {
   fill: #273e45;
   font-family: "Montserrat", "sans-serif";
-  font-size: 11px;
+  font-size: 9px;
   text-anchor: middle; }
 
 .instance {
@@ -58,9 +59,12 @@ body {
   .instance._is-hidden {
     fill: rgba(255, 255, 255, 0.15); }
 
+.instance:hover {
+  stroke: #2f837a; }
+
 .instance__name {
   fill: #273e45;
-  font-size: 11px;
+  font-size: 9px;
   font-family: "Montserrat", "sans-serif";
   text-anchor: middle; }
 
@@ -69,6 +73,14 @@ body {
 
 .instance__status-stopped {
   fill: #c64134; }
+
+.sg-link {
+  stroke: rgba(47, 131, 122, 0.3);
+  fill: none;
+  stroke-width: 2; }
+
+.sg-link__arrow {
+  fill: #2f837a; }
 
 .fa-filter {
   margin-right: 10px; }

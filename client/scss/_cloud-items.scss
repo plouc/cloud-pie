@@ -3,6 +3,7 @@
 //*******************************************
 .vpc {
   fill: #e9e5cd;
+  stroke: #d8d4bd;
   &._is-hidden {
     fill: rgba(233, 229, 205, 0.40);
   }
@@ -50,7 +51,7 @@
 .load-balancer__name {
   fill: $color_green_dark;
   font-family: $font_headings;
-  font-size: 11px;
+  font-size: 9px;
   text-anchor: middle;
 }
 
@@ -64,9 +65,12 @@
     fill: rgba(255, 255, 255, 0.15);
   }
 }
+.instance:hover {
+  stroke: #2f837a;
+}
 .instance__name {
   fill: $color_green_dark;
-  font-size: 11px;
+  font-size: 9px;
   font-family: $font_headings;
   text-anchor: middle;
 }
@@ -75,4 +79,14 @@
 }
 .instance__status-stopped {
   fill: #c64134;
+}
+
+
+.sg-link {
+  stroke: rgba(47, 131, 122, 0.30);
+  fill: none;
+  stroke-width: 2;
+}
+.sg-link__arrow {
+  fill: #2f837a;
 }

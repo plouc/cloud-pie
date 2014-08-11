@@ -68,10 +68,10 @@ angular.module('cloudpie').factory('StackLayoutManager', [
 
 
         var baseUnit           = 120;
-        var baseSpacing        = 26;
-        var loadBalancerOffset = 8;
+        var baseSpacing        = 50;
+        var loadBalancerOffset = 16;
 
-        var computeLayout = function (stack) {
+        var computeLayout = function (stack, sgLinks) {
 
             var vpcX = 0;
             _.forOwn(stack.vpcs, function (vpc) {
@@ -143,6 +143,95 @@ angular.module('cloudpie').factory('StackLayoutManager', [
             });
 
             _.forOwn(stack.instances, function (instance) {
+                instance.sgLinks   = [];
+                instance.showLinks = false;
+                instance.securityGroups.forEach(function (sgId) {
+                    if (sgLinks[sgId]) {
+                        sgLinks[sgId].forEach(function (rel) {
+                            _.forOwn(stack.instances, function (subInstance) {
+                                if (subInstance.id != instance.id) {
+                                    if (_.contains(subInstance.securityGroups, sgId)) {
+
+                                        var ax = instance.style.x;
+                                        var ay = instance.style.y;
+                                        var bx = subInstance.style.x;
+                                        var by = subInstance.style.y;
+
+                                        var angle = Math.atan2(by - ay, bx - ax) * 180 / Math.PI;
+
+                                    /*
+
+                                         A
+                                         |
+                                       -90
+                                         |
+                                 <– 180 –+— 0 ->
+                                         |
+                                        90
+                                         |
+                                         V
+
+                                     */
+
+                                        var path;
+
+                                        // RIGHT
+                                        if (angle <= 45 && angle >= -45) {
+                                            ax += instance.style.width;
+                                            ay += instance.style.height / 2;
+                                            by += subInstance.style.height / 2;
+
+                                            path = 'M ' + ax + ',' + ay;
+                                            path = path + ' C ' + bx + ',' + ay;
+                                            path = path + ' ' + ax + ',' + by;
+                                            path = path + ' ' + bx + ',' + by;
+
+                                        // BOTTOM
+                                        } else if (angle > 45 && angle <= 135) {
+                                            ax += instance.style.width / 2;
+                                            ay += instance.style.height;
+                                            bx += subInstance.style.width / 2;
+
+                                            path = 'M ' + ax + ',' + ay;
+                                            path = path + ' C ' + ax + ',' + by;
+                                            path = path + ' ' + bx + ',' + ay;
+                                            path = path + ' ' + bx + ',' + by;
+
+                                        // LEFT
+                                        } else if (angle > 135 || angle <= -135) {
+                                            ay += instance.style.height / 2;
+                                            bx += subInstance.style.width;
+                                            by += subInstance.style.height / 2;
+
+                                            path = 'M ' + ax + ',' + ay;
+                                            path = path + ' C ' + bx + ',' + ay;
+                                            path = path + ' ' + ax + ',' + by;
+                                            path = path + ' ' + bx + ',' + by;
+
+                                        // TOP
+                                        } else {
+                                            ax += instance.style.width / 2;
+                                            bx += subInstance.style.width / 2;
+                                            by += subInstance.style.height;
+
+                                            path = 'M ' + ax + ',' + ay;
+                                            path = path + ' C ' + ax + ',' + by;
+                                            path = path + ' ' + bx + ',' + ay;
+                                            path = path + ' ' + bx + ',' + by;
+                                        }
+
+                                        instance.sgLinks.push({
+                                            a: { x: ax, y: ay },
+                                            b: { x: bx, y: by },
+                                            path: path
+                                        });
+                                    }
+                                }
+                            });
+                        });
+                    }
+                });
+
                 instance.visible = true;
             });
 

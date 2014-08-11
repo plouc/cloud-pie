@@ -6,6 +6,14 @@
 
 <svg class="workspace" height="3000" width="1400">
 
+    <defs>
+        <marker id="myMarker" viewBox="0 0 10 10" refX="4" refY="5"
+                  markerUnits="strokeWidth" orient="auto"
+                  markerWidth="5" markerHeight="5">
+            <polyline points="0,0 10,5 0,10 1,5" class="sg-link__arrow" />
+        </marker>
+    </defs>
+
     <rect ng-repeat="vpc in vpcs"
           class="vpc"
           rx="6" ry="6"
@@ -32,16 +40,18 @@
         <text class="load-balancer__name"
               ng-attr-width="{{loadBalancer.width}}"
               ng-attr-x="{{loadBalancer.style.width / 2}}"
-              ng-attr-y="-20">{{loadBalancer.name}}</text>
+              y="-16">{{loadBalancer.name}}</text>
     </g>
 
     <g ng-repeat="instance in instances"
-       ng-attr-transform="translate({{instance.style.x}},{{instance.style.y}})">
+       ng-attr-transform="translate({{instance.style.x}},{{instance.style.y}})"
+       ng-mouseenter="instance.showLinks = true"
+       ng-mouseleave="instance.showLinks = false">
         <rect class="instance"
               ng-class="{ '_is-visible': instance.visible, '_is-hidden': !instance.visible }"
               rx="3" ry="3"
               ng-attr-width="{{instance.style.width}}"
-              ng-attr-height="{{instance.style.height}}" />
+              ng-attr-height="{{instance.style.height}}"/>
         <circle r="6"
                 ng-attr-cx="{{instance.style.width / 2}}"
                 cy="20"
@@ -49,6 +59,28 @@
         <text class="instance__name"
               ng-attr-x="{{instance.style.width / 2}}"
               ng-attr-y="{{instance.style.height / 2}}">{{instance.name}}</text>
+        <text class="instance__name"
+              ng-attr-x="{{instance.style.width / 2}}"
+              ng-attr-y="{{instance.style.height / 2 + 16}}">pub ip: {{instance.publicIpAddress || '~'}}</text>
+        <text class="instance__name"
+              ng-attr-x="{{instance.style.width / 2}}"
+              ng-attr-y="{{instance.style.height / 2 + 28}}">priv ip: {{instance.privateIpAddress || '~'}}</text>
+    </g>
+
+    <g ng-repeat="instance in instances" ng-if="instance.sgLinks.length && instance.showLinks">
+        <path ng-repeat="link in instance.sgLinks"
+              class="sg-link"
+              ng-attr-d="{{link.path}}"
+              marker-end="url(#myMarker)"
+              stroke-width="1"/>
+        <!--
+        <line ng-repeat="link in instance.sgLinks"
+              ng-attr-x1="{{link.a.x}}" ng-attr-y1="{{link.a.y}}"
+              ng-attr-x2="{{link.b.x}}" ng-attr-y2="{{link.b.y}}"
+              class="sg-link"
+              marker-end="url(#myMarker)"
+              stroke-width="1"/>
+        -->
     </g>
 </svg>
 

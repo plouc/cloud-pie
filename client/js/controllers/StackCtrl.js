@@ -3,11 +3,13 @@ angular.module('cloudpie').controller('StackCtrl', [
     'StackService',
     'StackLayoutManager',
     'StackFilters',
+    'SecurityGroupResolver',
     function (
         $scope,
         StackService,
         StackLayoutManager,
-        StackFilters
+        StackFilters,
+        SecurityGroupResolver
     ) {
         $scope.viz = {
             width:  500,
@@ -38,7 +40,7 @@ angular.module('cloudpie').controller('StackCtrl', [
 
             $scope.filters = StackFilters.build(stack);
 
-            StackLayoutManager.compute(stack);
+            StackLayoutManager.compute(stack, SecurityGroupResolver.buildRelations(stack.securityGroups));
 
             $scope.instances      = stack.instances;
             $scope.amis           = stack.amis;

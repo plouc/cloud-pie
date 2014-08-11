@@ -28,8 +28,13 @@ module.exports.fetch = function () {
                         privateIpAddress: instanceData.PrivateIpAddress,
                         publicIpAddress:  instanceData.PublicIpAddress || null,
                         vpc:              instanceData.VpcId,
-                        loadBalancers:    []
+                        loadBalancers:    [],
+                        securityGroups:   [],
                     };
+
+                    instanceData.SecurityGroups.forEach(function (sg) {
+                        instance.securityGroups.push(sg.GroupId);
+                    });
 
                     instance.tags = {};
                     instanceData.Tags.forEach(function (tag) {
