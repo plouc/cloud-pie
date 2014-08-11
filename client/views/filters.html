@@ -13,6 +13,10 @@
                       ng-class="{ '_is-active': !filters.vpcs.filter }">off</span>
             </div>
         </li>
+        <li class="filters__batch-select"
+            >select<span ng-click="filterSelectAll(filters.vpcs.ids)">all</span
+            ><span ng-click="filterSelectNone(filters.vpcs.ids)">none</span
+        ></li>
         <li data-ng-repeat="(vpcId, vpc) in filters.vpcs.ids"
             class="site-header__drop-down__list__item">
             <label><input data-ng-model="vpc.enabled" data-ng-change="refreshFilters()"
@@ -41,6 +45,10 @@
             <label><input type="checkbox" data-ng-change="refreshFilters()" data-ng-model="tagConfig.enabled"/>{{tag}}</label>
 
             <ul class="site-header__drop-down__list__sub">
+                <li class="filters__batch-select"
+                    >select<span ng-click="filterSelectAll(tagConfig.tags)">all</span
+                    ><span ng-click="filterSelectNone(tagConfig.tags)">none</span
+                ></li>
                 <li data-ng-repeat="tag in tagConfig.tags"
                     class="site-header__drop-down__list__item">
                     <label><input data-ng-model="tag.enabled" data-ng-change="refreshFilters()" type="checkbox"/>{{tag.value || 'null'}}</label>

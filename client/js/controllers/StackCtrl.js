@@ -14,6 +14,20 @@ angular.module('cloudpie').controller('StackCtrl', [
             height: 500
         };
 
+        $scope.filterSelectAll = function (filters) {
+            filters.forEach(function (filter) {
+                filter.enabled = true;
+            });
+            StackFilters.filter();
+        };
+
+        $scope.filterSelectNone = function (filters) {
+            filters.forEach(function (filter) {
+                filter.enabled = false;
+            });
+            StackFilters.filter();
+        };
+
         $scope.refreshFilters = function () {
             if (!$scope.filters) { return; }
 

@@ -1,0 +1,41 @@
+
+// filter icon
+.fa-filter {
+  margin-right: 10px;
+}
+.fa-filter._is-disabled {
+  color: #286169;
+}
+.fa-filter._is-active {
+  color: #c9dfb9;
+}
+
+// filters on/off switch
+.filters__switch {
+  padding: 5px 10px;
+  text-align: center;
+}
+.filters__switch .button {
+  border-color: #15232b;
+  background-color: #2e4a51;
+}
+.filters__switch .button._is-active {
+  background-color: #496e75;
+}
+
+// filters batch select (all/none)
+.filters__batch-select {
+  padding: 7px 12px;
+  text-align: left;
+  border-bottom: 1px solid #1b2f36;
+  white-space: pre;
+}
+.filters__batch-select span {
+  display: inline-block;
+  margin-left: 5px;
+  border-bottom: 1px dotted #d4e3c9;
+  cursor: pointer;
+}
+.filters__batch-select span:hover {
+  border-bottom-style: solid;
+}
