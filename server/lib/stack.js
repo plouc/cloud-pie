@@ -8,51 +8,104 @@ var ec2 = new AWS.EC2();
 var elb = new AWS.ELB();
 
 module.exports.fetch = function () {
+    var def  = Promise.defer();
 
-    var def             = Promise.defer();
-    var amis            = [];
-    var vpcsInstanceIds = {};
+    function tagsToObject(tagsArray) {
+        var tags = {};
+        tagsArray.forEach(function (tag) {
+            tags[tag.Key.toLowerCase()] = tag.Value;
+        });
+
+        return tags;
+    }
+
+    function groupResourceTags(resources) {
+        var grouped = [];
+
+        resources.forEach(function (resource) {
+            _.forOwn(resource.tags, function (tagValue, tagKey) {
+                if (!_.find(grouped, { key: tagKey })) {
+                    grouped.push({ key: tagKey, values: [] });
+                }
+                _.find(grouped, { key: tagKey }).values.push(tagValue);
+            });
+        });
+
+        grouped.forEach(function (tag) {
+            tag.values = _.uniq(tag.values);
+        });
+
+        return grouped;
+    }
+
+    var subnetsDef = Promise.defer();
+    ec2.describeSubnets({}, function (err, data) {
+        if (err) {
+            subnetsDef.reject(err);
+        } else {
+            subnetsDef.resolve(data.Subnets.map(function (subnet) {
+                return {
+                    id:                  subnet.SubnetId,
+                    state:               subnet.State,
+                    vpcId:               subnet.VpcId,
+                    cidrBlock:           subnet.CidrBlock,
+                    zone:                subnet.AvailabilityZone,
+                    azDefault:           subnet.DefaultForAz,
+                    mapPublicIpOnLaunch: subnet.MapPublicIpOnLaunch,
+                    tags:                tagsToObject(subnet.Tags),
+                    instances:           [],
+                    loadBalancers:       []
+                };
+            }));
+        }
+    });
+
+
+    var vpcsDef = Promise.defer();
+    ec2.describeVpcs({}, function (err, data) {
+        if (err) {
+            vpcsDef.reject(err);
+        } else {
+            vpcsDef.resolve(data.Vpcs.map(function (vpc) {
+                return {
+                    id:              vpc.VpcId,
+                    state:           vpc.State,
+                    cidrBlock:       vpc.CidrBlock,
+                    dhcpOptionsId:   vpc.DhcpOptionsId,
+                    instanceTenancy: vpc.InstanceTenancy,
+                    tags:            tagsToObject(vpc.Tags),
+                    isDefault:       vpc.IsDefault,
+                    subnets:         [],
+                    loadBalancers:   []
+                };
+            }));
+        }
+    });
+
 
     var instancesDef = Promise.defer();
+    var amis         = [];
     ec2.describeInstances({}, function (err, data) {
         if (err) {
             instancesDef.reject(err);
         } else {
-            var instances = {};
+            var instances = [];
             data.Reservations.forEach(function (reservation) {
-                reservation.Instances.forEach(function (instanceData) {
-                    var instance = {
-                        id:               instanceData.InstanceId,
-                        state:            instanceData.State.Name,
-                        type:             instanceData.InstanceType,
-                        privateIpAddress: instanceData.PrivateIpAddress,
-                        publicIpAddress:  instanceData.PublicIpAddress || null,
-                        vpc:              instanceData.VpcId,
-                        loadBalancers:    [],
-                        securityGroups:   [],
-                    };
+                reservation.Instances.forEach(function (instance) {
+                    amis.push(instance.ImageId);
 
-                    instanceData.SecurityGroups.forEach(function (sg) {
-                        instance.securityGroups.push(sg.GroupId);
+                    instances.push({
+                        id:                instance.InstanceId,
+                        state:             instance.State.Name,
+                        type:              instance.InstanceType,
+                        privateIpAddress:  instance.PrivateIpAddress,
+                        publicIpAddress:   instance.PublicIpAddress || null,
+                        vpcId:             instance.VpcId,
+                        subnetId:          instance.SubnetId,
+                        tags:              tagsToObject(instance.Tags),
+                        loadBalancers:     [],
+                        securityGroupsIds: _.pluck(instance.SecurityGroups, 'GroupId')
                     });
-
-                    instance.tags = {};
-                    instanceData.Tags.forEach(function (tag) {
-                        instance.tags[tag.Key.toLowerCase()] = tag.Value;
-                    });
-
-                    instance.name = instance.tags.name || null;
-
-                    instances[instance.id] = instance;
-
-                    amis.push(instanceData.ImageId);
-
-                    if (typeof instance.vpc != 'undefined') {
-                        if (!vpcsInstanceIds[instance.vpc]) {
-                            vpcsInstanceIds[instance.vpc] = [];
-                        }
-                        vpcsInstanceIds[instance.vpc].push(instance.id);
-                    }
                 });
             });
 
@@ -80,16 +133,29 @@ module.exports.fetch = function () {
         if (err) {
             loadBalancersDef.reject(err);
         } else {
-            var loadBalancers = {};
-
-            data.LoadBalancerDescriptions.forEach(function (loadBalancerData) {
-                loadBalancers[loadBalancerData.LoadBalancerName] = {
-                    name:      loadBalancerData.LoadBalancerName,
-                    dns:       loadBalancerData.DNSName,
-                    vpc:       loadBalancerData.VPCId,
-                    createdAt: loadBalancerData.CreatedTime,
-                    instances: _.pluck(loadBalancerData.Instances, 'InstanceId')
+            var loadBalancers = data.LoadBalancerDescriptions.map(function (lb) {
+                return {
+                    name:                      lb.LoadBalancerName,
+                    dnsName:                   lb.DNSName,
+                    canonicalHostedZoneName:   lb.CanonicalHostedZoneName,
+                    canonicalHostedZoneNameID: lb.CanonicalHostedZoneNameID,
+                    vpcId:                     lb.VPCId,
+                    createdAt:                 lb.CreatedTime,
+                    instancesIds:              _.pluck(lb.Instances, 'InstanceId'),
+                    instances:                 [], // populated later after instance info fetching
+                    scheme:                    lb.Scheme
                 };
+                /*
+                ListenerDescriptions: [Object],
+                Policies: [Object],
+                BackendServerDescriptions: [],
+                AvailabilityZones: [Object],
+                Subnets: [Object],
+                HealthCheck: [Object],
+                SourceSecurityGroup: [Object],
+                SecurityGroups: [Object],
+                Scheme: 'internet-facing' },
+                */
             });
 
             loadBalancersDef.resolve(loadBalancers);
@@ -99,7 +165,9 @@ module.exports.fetch = function () {
     Promise.props({
         instances:      instancesDef.promise,
         securityGroups: securityGroupsDef.promise,
-        loadBalancers:  loadBalancersDef.promise
+        loadBalancers:  loadBalancersDef.promise,
+        subnets:        subnetsDef.promise,
+        vpcs:           vpcsDef.promise
     })
         .then(function (props) {
             ec2.describeImages({
@@ -108,56 +176,38 @@ module.exports.fetch = function () {
                 if (err) {
                     def.reject(err);
                 } else {
-                    _.forOwn(props.loadBalancers, function (loadBalancer) {
-                        loadBalancer.instances.forEach(function (instanceId) {
-                            if (props.instances[instanceId]) {
-                                props.instances[instanceId].loadBalancers.push(loadBalancer.name);
-                            }
+                    props.loadBalancers.forEach(function (lb) {
+                        lb.instances = lb.instancesIds.map(function (instanceId) {
+                            return _.find(props.instances, { id: instanceId });
                         });
+                        _.find(props.vpcs, { id: lb.vpcId }).loadBalancers.push(lb);
                     });
 
-
-                    var allTags = {};
-                    _.forOwn(props.instances, function (instance) {
-                        _.forOwn(instance.tags, function (tagValue, tagKey) {
-                            if (!allTags[tagKey]) {
-                                allTags[tagKey] = [];
-                            }
-                            if (_.indexOf(allTags[tagKey], tagValue) === -1) {
-                                allTags[tagKey].push(tagValue);
-                            }
-                        });
+                    props.instances.forEach(function (instance) {
+                        _.find(props.subnets, { id: instance.subnetId }).instances.push(instance);
                     });
-                    props.tags = allTags;
 
-                    var amis = [];
-                    data.Images.forEach(function (image) {
-                        amis.push({
+                    _.forEach(props.subnets, function (subnet) {
+                        _.find(props.vpcs, { id: subnet.vpcId }).subnets.push(subnet);
+                    });
+
+                    var amis = data.Images.map(function (image) {
+                        return {
                             id:          image.ImageId,
                             name:        image.Name,
                             description: image.Description
-                        });
+                        };
                     });
-                    props.amis = amis;
 
-                    props.vpcs = {};
-                    ec2.describeVpcs({
-                        VpcIds: _.keys(vpcsInstanceIds)
-                    }, function (err, data) {
-                        if (err) {
-                            def.reject(err);
-                        } else {
-                            data.Vpcs.forEach(function (vpcData) {
-                                props.vpcs[vpcData.VpcId] = {
-                                    id:        vpcData.VpcId,
-                                    state:     vpcData.State,
-                                    default:   vpcData.IsDefault,
-                                    cidrBlock: vpcData.CidrBlock,
-                                    instances: vpcsInstanceIds[vpcData.VpcId]
-                                };
-                            });
-                            def.resolve(props);
-                        }
+                    def.resolve({
+                        vpcs:          props.vpcs,
+                        subnets:       props.subnets,
+                        instances:     props.instances,
+                        loadBalancers: props.loadBalancers,
+                        amis:          amis,
+                        vpcTags:       groupResourceTags(props.vpcs),
+                        subnetTags:    groupResourceTags(props.subnets),
+                        instanceTags:  groupResourceTags(props.instances)
                     });
                 }
             });
