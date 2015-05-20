@@ -1,8 +1,8 @@
 var fs    = require('fs');
-var stack = require('./lib/stack');
+var stack = require('./server/lib/stack');
 
 stack.fetch().then(function (data) {
-    fs.writeFile('../client/aws.json', JSON.stringify(data, null, '    '), function (err) {
+    fs.writeFile('dist/aws.json', JSON.stringify(data, null, '    '), function (err) {
         if (err) {
             throw err;
         }

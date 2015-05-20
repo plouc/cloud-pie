@@ -1,5 +1,6 @@
 var Promise = require('bluebird');
 var AWS     = require('aws-sdk');
+var chalk   = require('chalk');
 var _       = require('lodash');
 
 AWS.config.region = 'eu-west-1';
@@ -61,6 +62,50 @@ module.exports.fetch = function () {
     });
 
 
+    var igwsDef = Promise.defer();
+    ec2.describeInternetGateways({}, function (err, data) {
+        if (err) {
+            igwsDef.reject(err);
+        } else {
+            igwsDef.resolve(data.InternetGateways.map(function (igw) {
+                return {
+                    id:          igw.InternetGatewayId,
+                    tags:        tagsToObject(igw.Tags),
+                    attachments: igw.Attachments.map(function (attachment) {
+                        return {
+                            vpcId: attachment.VpcId,
+                            state: attachment.State
+                        };
+                    })
+                };
+            }));
+        }
+    });
+
+
+    var volumesDef = Promise.defer();
+    ec2.describeVolumes({}, function (err, data) {
+        if (err) {
+            volumesDef.reject(err);
+        } else {
+            // Attachments: [Object],
+            volumesDef.resolve(data.Volumes.map(function (volume) {
+                return {
+                    id:               volume.VolumeId,
+                    size:             volume.Size,
+                    snapshotId:       volume.SnapshotId,
+                    availabilityZone: volume.AvailabilityZone,
+                    state:            volume.State,
+                    createdAt:        volume.CreateTime,
+                    type:             volume.VolumeType,
+                    encrypted:        volume.Encrypted,
+                    tags:             tagsToObject(volume.Tags)
+                };
+            }));
+        }
+    });
+
+
     var vpcsDef = Promise.defer();
     ec2.describeVpcs({}, function (err, data) {
         if (err) {
@@ -76,7 +121,34 @@ module.exports.fetch = function () {
                     tags:            tagsToObject(vpc.Tags),
                     isDefault:       vpc.IsDefault,
                     subnets:         [],
-                    loadBalancers:   []
+                    loadBalancers:   [],
+                    internetGateway: null
+                };
+            }));
+        }
+    });
+
+
+    var vpcPeeringsDef = Promise.defer();
+    ec2.describeVpcPeeringConnections({}, function (err, data) {
+        if (err) {
+            vpcPeeringsDef.reject(err);
+        } else {
+            vpcPeeringsDef.resolve(data.VpcPeeringConnections.map(function (pc) {
+                return {
+                    id:               pc.VpcPeeringConnectionId,
+                    status:           pc.Status.Message,
+                    tags:             tagsToObject(pc.Tags),
+                    requesterVpcInfo: {
+                        cidrBlock: pc.RequesterVpcInfo.CidrBlock,
+                        ownerId:   pc.RequesterVpcInfo.OwnerId,
+                        id:        pc.RequesterVpcInfo.VpcId
+                    },
+                    accepterVpcInfo: {
+                        cidrBlock: pc.AccepterVpcInfo.CidrBlock,
+                        ownerId:   pc.AccepterVpcInfo.OwnerId,
+                        id:        pc.AccepterVpcInfo.VpcId
+                    }
                 };
             }));
         }
@@ -94,17 +166,31 @@ module.exports.fetch = function () {
                 reservation.Instances.forEach(function (instance) {
                     amis.push(instance.ImageId);
 
+                    var blockDeviceMappings = instance.BlockDeviceMappings.map(function (bdm) {
+                        return {
+                            deviceName: bdm.DeviceName,
+                            ebs: {
+                                id:                  bdm.Ebs.VolumeId,
+                                status:              bdm.Ebs.Status,
+                                attachTime:          bdm.Ebs.AttachTime,
+                                deleteOnTermination: bdm.Ebs.DeleteOnTermination
+                            }
+                        };
+                    });
+
                     instances.push({
-                        id:                instance.InstanceId,
-                        state:             instance.State.Name,
-                        type:              instance.InstanceType,
-                        privateIpAddress:  instance.PrivateIpAddress,
-                        publicIpAddress:   instance.PublicIpAddress || null,
-                        vpcId:             instance.VpcId,
-                        subnetId:          instance.SubnetId,
-                        tags:              tagsToObject(instance.Tags),
-                        loadBalancers:     [],
-                        securityGroupsIds: _.pluck(instance.SecurityGroups, 'GroupId')
+                        id:                  instance.InstanceId,
+                        type:                instance.InstanceType,
+                        state:               instance.State.Name,
+                        privateIpAddress:    instance.PrivateIpAddress,
+                        publicIpAddress:     instance.PublicIpAddress || null,
+                        vpcId:               instance.VpcId,
+                        subnetId:            instance.SubnetId,
+                        tags:                tagsToObject(instance.Tags),
+                        blockDeviceMappings: blockDeviceMappings,
+                        loadBalancers:       [],
+                        securityGroupsIds:   _.pluck(instance.SecurityGroups, 'GroupId'),
+                        ebsOptimized:        instance.EbsOptimized
                     });
                 });
             });
@@ -145,17 +231,6 @@ module.exports.fetch = function () {
                     instances:                 [], // populated later after instance info fetching
                     scheme:                    lb.Scheme
                 };
-                /*
-                ListenerDescriptions: [Object],
-                Policies: [Object],
-                BackendServerDescriptions: [],
-                AvailabilityZones: [Object],
-                Subnets: [Object],
-                HealthCheck: [Object],
-                SourceSecurityGroup: [Object],
-                SecurityGroups: [Object],
-                Scheme: 'internet-facing' },
-                */
             });
 
             loadBalancersDef.resolve(loadBalancers);
@@ -167,7 +242,10 @@ module.exports.fetch = function () {
         securityGroups: securityGroupsDef.promise,
         loadBalancers:  loadBalancersDef.promise,
         subnets:        subnetsDef.promise,
-        vpcs:           vpcsDef.promise
+        vpcs:           vpcsDef.promise,
+        vpcPeerings:    vpcPeeringsDef.promise,
+        volumes:        volumesDef.promise,
+        igws:           igwsDef.promise
     })
         .then(function (props) {
             ec2.describeImages({
@@ -185,10 +263,22 @@ module.exports.fetch = function () {
 
                     props.instances.forEach(function (instance) {
                         _.find(props.subnets, { id: instance.subnetId }).instances.push(instance);
+                        instance.blockDeviceMappings.forEach(function (bdm) {
+                            bdm.ebs.ebs = _.find(props.volumes, { id: bdm.ebs.id });
+                        });
                     });
 
                     _.forEach(props.subnets, function (subnet) {
                         _.find(props.vpcs, { id: subnet.vpcId }).subnets.push(subnet);
+                    });
+
+                    props.igws.forEach(function (igw) {
+                        igw.attachments.forEach(function (attachment) {
+                            var vpc = _.find(props.vpcs, { id: attachment.vpcId });
+                            if (vpc) {
+                                vpc.internetGateway = igw;
+                            }
+                        });
                     });
 
                     var amis = data.Images.map(function (image) {
@@ -200,14 +290,15 @@ module.exports.fetch = function () {
                     });
 
                     def.resolve({
-                        vpcs:          props.vpcs,
-                        subnets:       props.subnets,
-                        instances:     props.instances,
-                        loadBalancers: props.loadBalancers,
-                        amis:          amis,
-                        vpcTags:       groupResourceTags(props.vpcs),
-                        subnetTags:    groupResourceTags(props.subnets),
-                        instanceTags:  groupResourceTags(props.instances)
+                        vpcs:                props.vpcs,
+                        vpcPeerings:         props.vpcPeerings,
+                        loadBalancers:       props.loadBalancers,
+                        amis:                amis,
+                        vpcTags:             groupResourceTags(props.vpcs),
+                        subnetTags:          groupResourceTags(props.subnets),
+                        instanceTags:        groupResourceTags(props.instances),
+                        volumeTags:          groupResourceTags(props.volumes),
+                        internetGatewayTags: groupResourceTags(props.igws)
                     });
                 }
             });
