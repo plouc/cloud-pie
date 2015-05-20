@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html data-ng-app="cloudpie">
+<head>
+    <title>CLOUD PIE</title>
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.css" type="text/css">
+    <style type="text/css">
+        * {
+            box-sizing: border-box;
+        }
+        html, body {
+            font-family: helvetica, arial;
+            background: #273e45;
+            margin: 0;
+        }
+        #schema {
+            margin: 20px;
+        }
+        .vpc__wrapper {
+            fill: rgb(207, 244, 222);
+        }
+        .vpc__label__background {
+            fill: rgb(169, 223, 196);
+        }
+        .vpc__label__text {
+            font-family: "Montserrat", helvetica, arial;
+            font-weight: 700;
+        }
+        .subnet__wrapper {
+            /*border: 1px dashed rgb(121, 162, 141);*/
+            fill: rgb(217, 255, 232);
+        }
+        .subnet:last-child {
+            margin-bottom: 0;
+        }
+        .subnet__label__text {
+            font-weight: 700;
+            font-size: 13px;
+            font-family: "Montserrat", helvetica, arial;
+        }
+        .instance__wrapper {
+            fill: #273e45;
+            cursor: pointer;
+        }
+        .instance__name {
+            fill: rgb(207, 244, 222);
+            font-size: 11px;
+            font-family: consolas, menlo, monaco, monospace;
+        }
+        .instance:hover .instance__wrapper {
+            fill: #2e484f;
+        }
+        .instance:last-child {
+            margin-right: 0;
+        }
+        @-webkit-keyframes flickerAnimation {
+            0%   { opacity: 1;    }
+            50%  { opacity: 0.35; }
+            100% { opacity: 1;    }
+        }
+        .instance__state {
+            -webkit-animation: flickerAnimation 2s infinite;
+        }
+        .igw__cloud {
+            fill: rgb(207, 244, 222);
+        }
+        .igw__circle,
+        .igw__cloud__inside {
+            fill: #588da2;
+        }
+        .instance__state--stopped {
+            fill: #da2c1b;
+        }
+        .instance__state--running {
+            fill: #99f487;
+        }
+        .volume__wrapper {
+            fill: #36565d;
+        }
+        .volume__info {
+            position: absolute;
+            top:  0;
+            left: 0;
+            background: #222;
+            z-index: 10;
+            text-align: left;
+            box-shadow: 0 3px 2px rgba(0, 0, 0, 0.35);
+            border-radius: 2px;
+            display: none;
+        }
+        .volume__label__text {
+            fill: rgb(207, 244, 222);
+            font-size: 11px;
+            font-family: consolas, menlo, monaco, monospace;
+        }
+        .volume:hover .volume__info {
+            display: block;
+        }
+        .volume__info table {
+            font-size: 11px;
+            border-collapse: collapse;
+            line-height: 1em;
+            margin: 5px 0;
+        }
+        .volume__info table td {
+            white-space: pre;
+            padding: 5px 9px;
+        }
+        .volume__info table td:first-child {
+            font-weight: bold;
+        }
+        .volume__info table td:last-child {
+            color: #fff;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div id="schema"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
