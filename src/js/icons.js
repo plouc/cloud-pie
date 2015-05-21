@@ -35,6 +35,45 @@ module.exports = {
             .attr('class', 'igw__cloud__inside')
             .attr('d', 'M56.253,40.243l-1.939,1.33l-0.963-2.139c-1.48-3.273-4.762-5.387-8.361-5.387c-2.451,0-4.75,0.951-6.477,2.68c-1.736,1.73-2.689,4.047-2.689,6.498l0.039,1.699l-1.441,0.416c-2.34,0.672-4.227,3.67-4.227,5.701v0.73c0,2.469,2.99,5.34,6.846,5.34h25.92c3.854,0,6.844-2.871,6.844-5.34v-0.73c0-2.484-2.77-5.754-6.006-6.029l-1.736-0.145l-0.057-1.732c-0.064-1.98-1.68-3.539-3.674-3.539C57.585,39.597,56.864,39.819,56.253,40.243z')
         ;
+    },
 
+    vpcPeering(el) {
+        var vpcPeering = el.append('g').attr('transform', 'scale(0.6)');
+        vpcPeering = vpcPeering.append('g').attr('transform', 'translate(-50, -50)');
+
+        vpcPeering.append('circle')
+            .attr('class', 'vpc__peering__icon__circle')
+            .attr('transform', 'translate(50, 44)')
+            .attr('r', 30)
+        ;
+
+        vpcPeering.append('line')
+            .attr('class', 'vpc__peering__icon__line')
+            .attr('stroke-width', 3)
+            .attr('fill', 'none')
+            .attr('x1', '49.5').attr('y1', '21.697')
+            .attr('x2', '49.5').attr('y2', '65.697')
+        ;
+        vpcPeering.append('polygon').attr('fill', '#fff').attr('points', '46.047,22.697 49.787,16.221 53.527,22.697').attr('class', 'vpc__peering__icon__arrow');
+        vpcPeering.append('polygon').attr('fill', '#fff').attr('points', '46.047,64.697 49.787,71.174 53.527,64.697').attr('class', 'vpc__peering__icon__arrow');
+
+        vpcPeering.append('line')
+            .attr('class', 'vpc__peering__icon__line')
+            .attr('stroke-width', 3)
+            .attr('fill', 'none')
+            .attr('x1', '28').attr('y1', '45.197')
+            .attr('x2', '72').attr('y2', '45.197')
+        ;
+        vpcPeering.append('polygon').attr('fill', '#fff').attr('points', '29,49.102 22.523,45.361 29,41.621').attr('class', 'vpc__peering__icon__arrow');
+        vpcPeering.append('polygon').attr('fill', '#fff').attr('points', '71,49.102 77.477,45.361 71,41.621').attr('class', 'vpc__peering__icon__arrow');
+
+        vpcPeering.append('path')
+            .attr('class', 'vpc__peering__icon__cloud')
+            .attr('d', 'M59.302,54.179H39.604c-4.035,0-7.58-3.002-7.58-6.422V47.2c0-2.807,2.521-6.146,6.004-6.833c0.434-2.423,2.542-4.229,5.095-4.229c0.712,0,1.409,0.144,2.05,0.422c1.66-2.845,4.741-4.638,8.089-4.638c5.024,0,9.142,3.96,9.342,8.904c2.552,1.106,4.28,4.106,4.28,6.373v0.557C66.884,51.177,63.342,54.179,59.302,54.179z')
+        ;
+        vpcPeering.append('path')
+            .attr('class', 'vpc__peering__icon__cloud__inside')
+            .attr('d', 'M43.754,38.959c-1.363,0-2.465,1.065-2.511,2.421l-0.041,1.185l-1.185,0.1c-2.215,0.187-4.107,2.424-4.107,4.122v0.499c0,1.689,2.044,3.653,4.681,3.653h17.724c2.64,0,4.683-1.964,4.683-3.653v-0.499c0-1.389-1.289-3.44-2.892-3.898l-0.985-0.286l0.028-1.159c0-1.679-0.652-3.261-1.841-4.447c-1.18-1.181-2.752-1.83-4.428-1.83c-2.463,0-4.706,1.443-5.72,3.682l-0.655,1.466l-1.329-0.908C44.758,39.111,44.266,38.959,43.754,38.959z')
+        ;
     }
 };

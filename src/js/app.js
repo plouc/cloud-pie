@@ -16,8 +16,8 @@ function loadData(cb) {
 }
 
 var layout = {
-    vpc:      { spacing: 40, b: { t: 50, r: 20, b: 20, l: 20 } },
-    subnet:   { spacing: 24,  b: { t: 35, r: 15, b: 10, l: 15 } },
+    vpc:      { spacing: 60, b: { t: 50, r: 30, b: 20, l: 30 } },
+    subnet:   { spacing: 24, b: { t: 35, r: 15, b: 10, l: 15 } },
     instance: { size: 120, spacing: 10 }
 };
 
@@ -62,42 +62,8 @@ function drawSchema(vpcs, peerings) {
         });
     });
 
-
-    peerings.forEach(peering => {
-        var requester = _.find(vpcs, { id: peering.requesterVpcInfo.id });
-        var accepter  = _.find(vpcs, { id: peering.accepterVpcInfo.id  });
-
-        if (requester && accepter) {
-            console.log('requester', requester);
-            console.log('accepter',  accepter);
-
-            var points = [
-                { x: requester.layout.x + requester.layout.width / 2, y: 0   },
-                { x: requester.layout.x + requester.layout.width / 2, y: -80 },
-                { x: accepter.layout.x - layout.vpc.spacing / 2,      y: -80 },
-                { x: accepter.layout.x - layout.vpc.spacing / 2,      y: 100 },
-                { x: accepter.layout.x,                               y: 100 }
-            ];
-
-            var line = d3.svg.line()
-                .x(d => d.x)
-                .y(d => d.y)
-                .interpolate('linear')
-            ;
-
-            var peeringEl = schema.append('g');
-
-            peeringEl.append('path').datum(points)
-                .attr('class', 'vpc-peering__path')
-                .attr('d', line)
-            ;
-        }
-    });
-
-
-
-    var vpcs = schema.selectAll('.vpc').data(vpcs);
-    vpcs.enter().append('g')
+    var vpcsNodes = schema.selectAll('.vpc').data(vpcs);
+    vpcsNodes.enter().append('g')
         .attr('class', 'vpc')
         .attr('transform', d => `translate(${ d.layout.x }, 0)`)
         .each(function (d) {
@@ -134,7 +100,40 @@ function drawSchema(vpcs, peerings) {
         })
     ;
 
-    var subnets = vpcs.selectAll('.subnets').data(d => d.subnets);
+    peerings.forEach(peering => {
+        var requester = _.find(vpcs, { id: peering.requesterVpcInfo.id });
+        var accepter  = _.find(vpcs, { id: peering.accepterVpcInfo.id  });
+
+        if (requester && accepter) {
+            console.log('requester', requester);
+            console.log('accepter',  accepter);
+
+            var points = [
+                { x: requester.layout.x + requester.layout.width / 2, y: 0   },
+                { x: requester.layout.x + requester.layout.width / 2, y: -80 },
+                { x: accepter.layout.x - layout.vpc.spacing / 2,      y: -80 },
+                { x: accepter.layout.x - layout.vpc.spacing / 2,      y: 100 },
+                { x: accepter.layout.x,                               y: 100 }
+            ];
+
+            var line = d3.svg.line()
+                .x(d => d.x)
+                .y(d => d.y)
+                .interpolate('linear')
+            ;
+
+            var peeringEl = schema.append('g');
+            peeringEl.append('path').datum(points)
+                .attr('class', 'vpc-peering__path')
+                .attr('d', line)
+            ;
+
+            icons.vpcPeering(peeringEl.append('g').attr('transform', `translate(${ points[0].x }, ${ points[0].y })`));
+            icons.vpcPeering(peeringEl.append('g').attr('transform', `translate(${ points[4].x }, ${ points[4].y })`));
+        }
+    });
+
+    var subnets = vpcsNodes.selectAll('.subnets').data(d => d.subnets);
     subnets.enter().append('g')
         .attr('class', 'subnet')
         .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
