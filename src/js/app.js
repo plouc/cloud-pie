@@ -31,8 +31,12 @@ function drawSchema(vpcs, peerings) {
 
     var vpcX = 0;
     vpcs.forEach(vpc => {
-        vpc.subnets      = vpc.subnets.filter(d => d.instances.length > 0);
-        vpc.maxInstances = _.max(vpc.subnets, subnet => subnet.instances.length).instances.length;
+        vpc.subnets       = vpc.subnets.filter(d => d.instances.length > 0);
+        vpc.maxInstances  = 0;
+        var maxInstSubnet = _.max(vpc.subnets, subnet => subnet.instances.length);
+        if (maxInstSubnet) {
+            vpc.maxInstances  = maxInstSubnet.instances.length;
+        }
 
         // pre-compute layout
         vpc.layout = {};
