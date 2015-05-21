@@ -110,19 +110,12 @@ function drawSchema(vpcs, peerings) {
                 .attr({ rx: 5, ry: 5 })
             ;
 
-            vpc.append('rect')
-                .attr('class', 'vpc__label__background')
-                .attr('width', 200)
-                .attr('height', 36)
-                .attr('x', layout.vpc.b.l)
-                .attr('y', -18)
-                .attr({ rx: 2, ry: 2 })
-            ;
-
-            vpc.append('text')
+            var vpcIcon = vpc.append('g').attr('transform', 'translate(55, 0)');
+            icons.vpc(vpcIcon);
+            vpcIcon.append('text')
                 .attr('class', 'vpc__label__text')
-                .attr('x', layout.vpc.b.l + 10)
-                .attr('y', 4)
+                .attr('text-anchor', 'middle')
+                .attr('y', -46)
                 .text(d.tags.name ? d.tags.name : d.id)
             ;
 

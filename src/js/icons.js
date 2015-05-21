@@ -1,21 +1,24 @@
 module.exports = {
     vpc(el) {
-        var vpc = el.append('g').attr('transform', 'translate(-50, -50)');
+        var vpc = el.append('g').attr('transform', 'translate(-50, -50) scale(0.8)');
 
-        vpc.append('polygon').attr('fill', '#F58536').attr('points', '59.49,55.015 28.627,57.502 28.627,75.312 59.49,66.936');
-        vpc.append('polygon').attr('fill', '#F58536').attr('points', '43.553,49.979 28.512,49.979 28.512,24.703 43.553,28.771');
-        vpc.append('polygon').attr('fill', '#6B3A19').attr('points', '44.025,33.132 55.795,30.13 75.975,36.184 65.173,37.704');
-        vpc.append('polygon').attr('fill', '#F58536').attr('points', '58.881,49.979 49.961,49.979 49.961,13.979 58.881,18.439');
-        vpc.append('polygon').attr('fill', '#F58536').attr('points', '75.975,49.979 79.783,49.979 79.783,28.891 75.975,26.986');
-        vpc.append('polygon').attr('fill', '#F58536').attr('points', '79.783,37.326 49.961,28.381 49.961,13.979 79.783,28.891');
-        vpc.append('polygon').attr('fill', '#9D5025').attr('points', '34.086,49.979 49.961,49.979 49.961,13.979 34.086,21.916');
-        vpc.append('polygon').attr('fill', '#9D5025').attr('points', '28.512,24.743 20.217,28.932 20.217,50.02 28.512,50.02');
-        vpc.append('polygon').attr('fill', '#9D5025').attr('points', '65.225,49.979 75.975,49.979 75.975,36.184 65.225,37.696');
-        vpc.append('polygon').attr('fill', '#F58536').attr('points', '79.783,56.268 49.961,60.714 49.961,85.979 79.783,71.067');
-        vpc.append('polygon').attr('fill', '#9D5025').attr('points', '34.086,58.42 49.961,60.796 49.961,86.02 34.086,78.082');
-        vpc.append('polygon').attr('fill', '#9D5025').attr('points', '20.217,56.344 28.627,57.583 28.627,75.354 20.217,71.148');
-        vpc.append('polygon').attr('fill', '#FBBF93').attr('points', '79.783,56.268 65.443,55.382 34.086,58.38 49.82,60.734');
-        vpc.append('polygon').attr('fill', '#FBBF93').attr('points', '59.49,55.015 50.031,54.431 20.217,56.283 28.627,57.543');
+        var front = 'vpc__icon__front';
+        var left  = 'vpc__icon__left';
+        var top   = 'vpc__icon__top';
+
+        vpc.append('polygon').attr('class', front).attr('points', '59.49,55.015 28.627,57.502 28.627,75.312 59.49,66.936');
+        vpc.append('polygon').attr('class', front).attr('points', '43.553,49.979 28.512,49.979 28.512,24.703 43.553,28.771');
+        vpc.append('polygon').attr('class', front).attr('points', '58.881,49.979 49.961,49.979 49.961,13.979 58.881,18.439');
+        vpc.append('polygon').attr('class', front).attr('points', '75.975,49.979 79.783,49.979 79.783,28.891 75.975,26.986');
+        vpc.append('polygon').attr('class', front).attr('points', '79.783,37.326 49.961,28.381 49.961,13.979 79.783,28.891');
+        vpc.append('polygon').attr('class',  left).attr('points', '34.086,49.979 49.961,49.979 49.961,13.979 34.086,21.916');
+        vpc.append('polygon').attr('class',  left).attr('points', '28.512,24.743 20.217,28.932 20.217,50.02 28.512,50.02');
+        vpc.append('polygon').attr('class',  left).attr('points', '65.225,49.979 75.975,49.979 75.975,36.184 65.225,37.696');
+        vpc.append('polygon').attr('class', front).attr('points', '79.783,56.268 49.961,60.714 49.961,85.979 79.783,71.067');
+        vpc.append('polygon').attr('class',  left).attr('points', '34.086,58.42 49.961,60.796 49.961,86.02 34.086,78.082');
+        vpc.append('polygon').attr('class',  left).attr('points', '20.217,56.344 28.627,57.583 28.627,75.354 20.217,71.148');
+        vpc.append('polygon').attr('class',   top).attr('points', '79.783,56.268 65.443,55.382 34.086,58.38 49.82,60.734');
+        vpc.append('polygon').attr('class',   top).attr('points', '59.49,55.015 50.031,54.431 20.217,56.283 28.627,57.543');
     },
 
     igw(el) {
