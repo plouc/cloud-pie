@@ -5,8 +5,9 @@ var _       = require('lodash');
 
 AWS.config.region = 'eu-west-1';
 
-var ec2 = new AWS.EC2();
-var elb = new AWS.ELB();
+var ec2         = new AWS.EC2();
+var elb         = new AWS.ELB();
+var autoscaling = new AWS.AutoScaling();
 
 module.exports.fetch = function () {
     var def  = Promise.defer();
@@ -38,6 +39,38 @@ module.exports.fetch = function () {
 
         return grouped;
     }
+
+
+    var autoscalingsDef = Promise.defer();
+    autoscaling.describeAutoScalingGroups({}, function (err, data) {
+        if (err) {
+            autoscalingsDef.reject(err);
+        } else {
+            autoscalingsDef.resolve(data.AutoScalingGroups.map(function (autoscaling) {
+                return {
+                    name:                autoscaling.AutoScalingGroupName,
+                    arn:                 autoscaling.AutoScalingGroupARN,
+                    minSize:             autoscaling.MinSize,
+                    maxSize:             autoscaling.MaxSize,
+                    desiredCapacity:     autoscaling.DesiredCapacity,
+                    azs:                 autoscaling.AvailabilityZones,
+                    defaultCooldown:     autoscaling.DefaultCooldown,
+                    TerminationPolicies: autoscaling.TerminationPolicies,
+                    subnets:             autoscaling.VPCZoneIdentifier.split(','),
+                    instances:           autoscaling.Instances.map(function (instance) {
+                        return {
+                            id:             instance.InstanceId,
+                            az:             instance.AvailabilityZone,
+                            state:          instance.LifecycleState,
+                            healthStatus:   instance.HealthStatus,
+                            launchConfName: instance.LaunchConfigurationName
+                        };
+                    })
+                };
+            }))
+        }
+    });
+
 
     var subnetsDef = Promise.defer();
     ec2.describeSubnets({}, function (err, data) {
@@ -121,6 +154,7 @@ module.exports.fetch = function () {
                     tags:            tagsToObject(vpc.Tags),
                     isDefault:       vpc.IsDefault,
                     subnets:         [],
+                    autoscalings:    [],
                     loadBalancers:   [],
                     internetGateway: null
                 };
@@ -245,7 +279,8 @@ module.exports.fetch = function () {
         vpcs:           vpcsDef.promise,
         vpcPeerings:    vpcPeeringsDef.promise,
         volumes:        volumesDef.promise,
-        igws:           igwsDef.promise
+        igws:           igwsDef.promise,
+        autoscalings:   autoscalingsDef.promise
     })
         .then(function (props) {
             ec2.describeImages({
@@ -264,6 +299,23 @@ module.exports.fetch = function () {
                         }
                     });
 
+                    _.forEach(props.subnets, function (subnet) {
+                        _.find(props.vpcs, { id: subnet.vpcId }).subnets.push(subnet);
+                    });
+
+                    props.autoscalings.forEach(function (autoscaling) {
+                        if (autoscaling.subnets.length > 0) {
+                            var subnet = _.find(props.subnets, { id: autoscaling.subnets[0] });
+                            if (subnet && subnet.vpcId) {
+                                var vpc = _.find(props.vpcs, { id: subnet.vpcId });
+                                if (vpc) {
+                                    vpc.autoscalings.push(autoscaling);
+                                    vpc.autoscalings = _.uniq(vpc.autoscalings);
+                                }
+                            }
+                        }
+                    });
+
                     props.instances.forEach(function (instance) {
                         var instanceSubnet = _.find(props.subnets, { id: instance.subnetId });
                         if (instanceSubnet) {
@@ -272,10 +324,6 @@ module.exports.fetch = function () {
                         instance.blockDeviceMappings.forEach(function (bdm) {
                             bdm.ebs.ebs = _.find(props.volumes, { id: bdm.ebs.id });
                         });
-                    });
-
-                    _.forEach(props.subnets, function (subnet) {
-                        _.find(props.vpcs, { id: subnet.vpcId }).subnets.push(subnet);
                     });
 
                     props.igws.forEach(function (igw) {

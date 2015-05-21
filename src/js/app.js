@@ -4,8 +4,8 @@ var _       = require('lodash');
 var icons   = require('./icons');
 
 var schema  = d3.select('#schema').append('svg')
-    .attr('width', 3000)
-    .attr('height', 2000)
+    .attr('width',  3000)
+    .attr('height', 3000)
 .append('g')
     .attr('transform', 'translate(30, 120)')
 ;
@@ -16,9 +16,10 @@ function loadData(cb) {
 }
 
 var layout = {
-    vpc:      { spacing: 60, b: { t: 50, r: 30, b: 20, l: 30 } },
-    subnet:   { spacing: 24, b: { t: 35, r: 15, b: 10, l: 15 } },
-    instance: { size: 120, spacing: 10 }
+    vpc:         { spacing: 60, b: { t: 120, r: 30, b: 20, l: 30 } },
+    autoscaling: { size: 80, spacing: 10 },
+    subnet:      { spacing: 24, b: { t: 35,  r: 15, b: 10, l: 15 } },
+    instance:    { size: 120, spacing: 10 }
 };
 
 var instancePadding   = 8;
@@ -50,6 +51,8 @@ function drawSchema(vpcs, peerings) {
         vpc.layout.x = vpcX;
         vpcX += vpc.layout.width + layout.vpc.spacing;
 
+        var instances = [];
+
         vpc.subnets.forEach((subnet, i) => {
             subnet.layout = {
                 x: layout.vpc.b.l,
@@ -59,6 +62,38 @@ function drawSchema(vpcs, peerings) {
                         layout.subnet.b.l + layout.subnet.b.r,
                 height: layout.instance.size + layout.subnet.b.t + layout.subnet.b.b
             };
+
+            subnet.instances.forEach((instance, i) => {
+                instance.layout = {
+                    x: subnet.layout.x +
+                       i * layout.instance.size +
+                       i * layout.instance.spacing + layout.subnet.b.l,
+                    y: subnet.layout.y + layout.subnet.b.t,
+                    width:  layout.instance.size,
+                    height: layout.instance.size
+                };
+
+                instances.push(instance);
+            });
+        });
+
+        vpc.autoscalings.forEach((autoscaling, i) => {
+            autoscaling.layout = {
+                x: i * (layout.autoscaling.size + layout.autoscaling.spacing) - layout.autoscaling.spacing + 60,
+                y: 60
+            };
+            autoscaling.paths = [];
+            autoscaling.instances.forEach(instanceInfo => {
+                var instance = _.find(instances, { id: instanceInfo.id });
+                if (instance) {
+                    autoscaling.paths.push([
+                        { x: autoscaling.layout.x,      y: autoscaling.layout.y },
+                        { x: autoscaling.layout.x, y: autoscaling.layout.y + 40 },
+                        { x: instance.layout.x + instance.layout.width / 2,    y: instance.layout.y - 20   },
+                        { x: instance.layout.x + instance.layout.width / 2,    y: instance.layout.y    }
+                    ]);
+                }
+            });
         });
     });
 
@@ -105,8 +140,8 @@ function drawSchema(vpcs, peerings) {
         var accepter  = _.find(vpcs, { id: peering.accepterVpcInfo.id  });
 
         if (requester && accepter) {
-            console.log('requester', requester);
-            console.log('accepter',  accepter);
+            //console.log('requester', requester);
+            //console.log('accepter',  accepter);
 
             var points = [
                 { x: requester.layout.x + requester.layout.width / 2, y: 0   },
@@ -133,14 +168,15 @@ function drawSchema(vpcs, peerings) {
         }
     });
 
+
     var subnets = vpcsNodes.selectAll('.subnets').data(d => d.subnets);
     subnets.enter().append('g')
         .attr('class', 'subnet')
-        .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
         .each(function (d) {
             var subnet = d3.select(this);
 
             subnet.append('rect')
+                .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
                 .attr('class', 'subnet__wrapper')
                 .attr('width',  d.layout.width)
                 .attr('height', d.layout.height)
@@ -148,6 +184,7 @@ function drawSchema(vpcs, peerings) {
             ;
 
             subnet.append('rect')
+                .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
                 .attr('class', 'vpc__label__background')
                 .attr('width', 140)
                 .attr('height', 28)
@@ -157,6 +194,7 @@ function drawSchema(vpcs, peerings) {
             ;
 
             subnet.append('text')
+                .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
                 .attr('class', 'subnet__label__text')
                 .attr('x', layout.subnet.b.l + 10)
                 .attr('y', 4)
@@ -165,18 +203,39 @@ function drawSchema(vpcs, peerings) {
         })
     ;
 
+
+    var autoscalings = vpcsNodes.selectAll('.autoscaling').data(d => d.autoscalings);
+    autoscalings.enter().append('g')
+        .attr('class', 'autoscaling')
+        .each(function (d) {
+            var line = d3.svg.line()
+                .x(d => d.x)
+                .y(d => d.y)
+                .interpolate('step')
+            ;
+
+            d.paths.forEach(path => {
+                d3.select(this).append('path').attr('class', 'as__instance__link').datum(path).attr('d', line);
+            });
+
+            var autoscaling = d3.select(this).append('g')
+                .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
+            ;
+            icons.autoscaling(autoscaling);
+        })
+    ;
+
+
     var instances = subnets.selectAll('.instance').data(d => d.instances);
     instances.enter().append('g')
-        .attr('transform', (d, i) => {
-            return `translate(${ i * layout.instance.size + i * layout.instance.spacing + layout.subnet.b.l }, ${ layout.subnet.b.t })`;
-        })
+        .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
         .attr('class', 'instance')
         .each(function (d) {
             var instance = d3.select(this);
             instance.append('rect')
                 .attr('class', 'instance__wrapper')
-                .attr('width',  layout.instance.size)
-                .attr('height', layout.instance.size)
+                .attr('width',  d.layout.width)
+                .attr('height', d.layout.height)
                 .attr({ rx: 3, ry: 3 })
             ;
 
