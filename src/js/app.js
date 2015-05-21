@@ -7,7 +7,7 @@ var schema  = d3.select('#schema').append('svg')
     .attr('width', 3000)
     .attr('height', 2000)
 .append('g')
-    .attr('transform', 'translate(30, 30)')
+    .attr('transform', 'translate(30, 120)')
 ;
 var tags    = d3.select('#tags');
 
@@ -16,8 +16,8 @@ function loadData(cb) {
 }
 
 var layout = {
-    vpc:      { spacing: 100, b: { t: 50, r: 20, b: 20, l: 20 } },
-    subnet:   { spacing: 15,  b: { t: 35, r: 15, b: 10, l: 15 } },
+    vpc:      { spacing: 40, b: { t: 50, r: 20, b: 20, l: 20 } },
+    subnet:   { spacing: 24,  b: { t: 35, r: 15, b: 10, l: 15 } },
     instance: { size: 120, spacing: 10 }
 };
 
@@ -27,30 +27,82 @@ var volumeSize        = 32;
 var volumeSpacing     = 6;
 
 
-function drawSchema(vpcs) {
+function drawSchema(vpcs, peerings) {
 
+    var vpcX = 0;
     vpcs.forEach(vpc => {
         vpc.subnets      = vpc.subnets.filter(d => d.instances.length > 0);
         vpc.maxInstances = _.max(vpc.subnets, subnet => subnet.instances.length).instances.length;
+
+        // pre-compute layout
+        vpc.layout = {};
+        vpc.layout.width = vpc.maxInstances * layout.instance.size +
+                          (vpc.maxInstances - 1) * layout.instance.spacing +
+                          layout.vpc.b.l + layout.vpc.b.r +
+                          layout.subnet.b.l + layout.subnet.b.r;
+        vpc.layout.height = vpc.subnets.length * layout.instance.size +
+                            vpc.subnets.length * (layout.subnet.b.t + layout.subnet.b.b + layout.subnet.spacing) - layout.subnet.spacing +
+                            layout.vpc.b.t + layout.vpc.b.b;
+        vpc.layout.x = vpcX;
+        vpcX += vpc.layout.width + layout.vpc.spacing;
+
+        vpc.subnets.forEach((subnet, i) => {
+            subnet.layout = {
+                x: layout.vpc.b.l,
+                y: i * (layout.instance.size + layout.subnet.b.t + layout.subnet.b.b) + i * layout.subnet.spacing + layout.vpc.b.t,
+                width:  vpc.maxInstances * layout.instance.size +
+                       (vpc.maxInstances - 1) * layout.instance.spacing +
+                        layout.subnet.b.l + layout.subnet.b.r,
+                height: layout.instance.size + layout.subnet.b.t + layout.subnet.b.b
+            };
+        });
     });
 
+
+    peerings.forEach(peering => {
+        var requester = _.find(vpcs, { id: peering.requesterVpcInfo.id });
+        var accepter  = _.find(vpcs, { id: peering.accepterVpcInfo.id  });
+
+        if (requester && accepter) {
+            console.log('requester', requester);
+            console.log('accepter',  accepter);
+
+            var points = [
+                { x: requester.layout.x + requester.layout.width / 2, y: 0   },
+                { x: requester.layout.x + requester.layout.width / 2, y: -80 },
+                { x: accepter.layout.x - layout.vpc.spacing / 2,      y: -80 },
+                { x: accepter.layout.x - layout.vpc.spacing / 2,      y: 100 },
+                { x: accepter.layout.x,                               y: 100 }
+            ];
+
+            var line = d3.svg.line()
+                .x(d => d.x)
+                .y(d => d.y)
+                .interpolate('linear')
+            ;
+
+            var peeringEl = schema.append('g');
+
+            peeringEl.append('path').datum(points)
+                .attr('class', 'vpc-peering__path')
+                .attr('d', line)
+            ;
+        }
+    });
+
+
+
     var vpcs = schema.selectAll('.vpc').data(vpcs);
-    var vpcX = 0;
     vpcs.enter().append('g')
         .attr('class', 'vpc')
-        .attr('transform', (d, i) => {
-            var x = vpcX;
-            vpcX += d.maxInstances * layout.instance.size + (d.maxInstances - 1) * layout.instance.spacing + layout.vpc.spacing + layout.vpc.b.l + layout.vpc.b.r + layout.subnet.b.l + layout.subnet.b.r;
-
-            return `translate(${ x }, 0)`;
-        })
+        .attr('transform', d => `translate(${ d.layout.x }, 0)`)
         .each(function (d) {
             var vpc = d3.select(this);
 
             vpc.append('rect')
                 .attr('class', 'vpc__wrapper')
-                .attr('width', d.maxInstances * layout.instance.size + (d.maxInstances - 1) * layout.instance.spacing + layout.vpc.b.l + layout.vpc.b.r + layout.subnet.b.l + layout.subnet.b.r)
-                .attr('height', d.subnets.length * layout.instance.size + d.subnets.length * (layout.subnet.b.t + layout.subnet.b.b + layout.subnet.spacing) - layout.subnet.spacing + layout.vpc.b.t + layout.vpc.b.b)
+                .attr('width', d.layout.width)
+                .attr('height', d.layout.height)
                 .attr({ rx: 5, ry: 5 })
             ;
 
@@ -67,11 +119,20 @@ function drawSchema(vpcs) {
                 .attr('class', 'vpc__label__text')
                 .attr('x', layout.vpc.b.l + 10)
                 .attr('y', 4)
-                .text(d.id)
+                .text(d.tags.name ? d.tags.name : d.id)
             ;
 
             if (d.internetGateway !== null) {
-                //icons.igw(vpc);
+                var igwGroup = vpc.append('g')
+                    .attr('transform', `translate(${ d.layout.width - 30 - layout.vpc.b.r }, 0)`)
+                ;
+                icons.igw(igwGroup);
+                igwGroup.append('text')
+                    .attr('class', 'igw__label__text')
+                    .text(d.internetGateway.tags.name ? d.internetGateway.tags.name : d.internetGateway.id)
+                    .attr('text-anchor', 'middle')
+                    .attr('y', -40)
+                ;
             }
         })
     ;
@@ -79,17 +140,14 @@ function drawSchema(vpcs) {
     var subnets = vpcs.selectAll('.subnets').data(d => d.subnets);
     subnets.enter().append('g')
         .attr('class', 'subnet')
-        .attr('transform', (d, i) => {
-            return `translate(${ layout.vpc.b.l }, ${ i * (layout.instance.size + layout.subnet.b.t + layout.subnet.b.b) + i * layout.subnet.spacing + layout.vpc.b.t})`;
-        })
+        .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
         .each(function (d) {
-            var subnet       = d3.select(this);
-            var maxInstances = d3.select(this.parentNode).datum().maxInstances;
+            var subnet = d3.select(this);
 
             subnet.append('rect')
                 .attr('class', 'subnet__wrapper')
-                .attr('width', maxInstances * layout.instance.size + (maxInstances - 1) * layout.instance.spacing + layout.subnet.b.l + layout.subnet.b.r)
-                .attr('height', layout.instance.size + layout.subnet.b.t + layout.subnet.b.b)
+                .attr('width',  d.layout.width)
+                .attr('height', d.layout.height)
                 .attr({ rx: 3, ry: 3 })
             ;
 
@@ -106,7 +164,7 @@ function drawSchema(vpcs) {
                 .attr('class', 'subnet__label__text')
                 .attr('x', layout.subnet.b.l + 10)
                 .attr('y', 4)
-                .text(d.id)
+                .text(d.tags.name ? d.tags.name : d.id)
             ;
         })
     ;
@@ -137,7 +195,7 @@ function drawSchema(vpcs) {
                 .attr('class', 'instance__name')
                 .attr('x', 24)
                 .attr('y', 20)
-                .text(d.id)
+                .text(d.tags.name ? d.tags.name : d.id)
             ;
         })
     ;
@@ -169,7 +227,7 @@ function drawSchema(vpcs) {
 }
 
 loadData((data) => {
-    drawSchema(data.vpcs);
+    drawSchema(data.vpcs, data.vpcPeerings);
 });
 
 
