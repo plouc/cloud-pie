@@ -6,7 +6,7 @@
 git clone git@github.com:plouc/cloud-pie.git
 cd cloud-pie
 npm install
-``
+```
 
 ## Fetch AWS data
 ```sh
