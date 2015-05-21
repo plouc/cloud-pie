@@ -258,7 +258,10 @@ module.exports.fetch = function () {
                         lb.instances = lb.instancesIds.map(function (instanceId) {
                             return _.find(props.instances, { id: instanceId });
                         });
-                        _.find(props.vpcs, { id: lb.vpcId }).loadBalancers.push(lb);
+                        var instanceVpc = _.find(props.vpcs, { id: lb.vpcId });
+                        if (instanceVpc) {
+                            instanceVpc.loadBalancers.push(lb);
+                        }
                     });
 
                     props.instances.forEach(function (instance) {
