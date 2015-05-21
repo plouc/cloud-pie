@@ -4,3 +4,4 @@ node_modules
 .sass-cache
 client/vendor
 aws.json
+dist/js/app.js
