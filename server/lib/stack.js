@@ -258,14 +258,17 @@ module.exports.fetch = function () {
                         lb.instances = lb.instancesIds.map(function (instanceId) {
                             return _.find(props.instances, { id: instanceId });
                         });
-                        var instanceVpc = _.find(props.vpcs, { id: lb.vpcId });
-                        if (instanceVpc) {
-                            instanceVpc.loadBalancers.push(lb);
+                        var lbVpc = _.find(props.vpcs, { id: lb.vpcId });
+                        if (lbVpc) {
+                            lbVpc.loadBalancers.push(lb);
                         }
                     });
 
                     props.instances.forEach(function (instance) {
-                        _.find(props.subnets, { id: instance.subnetId }).instances.push(instance);
+                        var instanceSubnet = _.find(props.subnets, { id: instance.subnetId });
+                        if (instanceSubnet) {
+                            instanceSubnet.instances.push(instance);
+                        }
                         instance.blockDeviceMappings.forEach(function (bdm) {
                             bdm.ebs.ebs = _.find(props.volumes, { id: bdm.ebs.id });
                         });
