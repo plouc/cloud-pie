@@ -12,7 +12,7 @@ var schema  = d3.select('#schema').append('svg')
 var tags    = d3.select('#tags');
 
 function loadData(cb) {
-    request.get('aws.json').end((err, res) => { if (err) throw err; cb(res.body); });
+    request.get('aws_ekino.json').end((err, res) => { if (err) throw err; cb(res.body); });
 }
 
 var layout = {
@@ -34,7 +34,7 @@ function drawSchema(vpcs, peerings) {
         vpc.subnets       = vpc.subnets.filter(d => d.instances.length > 0);
         vpc.maxInstances  = 0;
         var maxInstSubnet = _.max(vpc.subnets, subnet => subnet.instances.length);
-        if (maxInstSubnet) {
+        if (_.isObject(maxInstSubnet)) {
             vpc.maxInstances  = maxInstSubnet.instances.length;
         }
 
