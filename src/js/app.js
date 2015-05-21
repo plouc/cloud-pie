@@ -12,7 +12,7 @@ var schema  = d3.select('#schema').append('svg')
 var tags    = d3.select('#tags');
 
 function loadData(cb) {
-    request.get('aws_ekino.json').end((err, res) => { if (err) throw err; cb(res.body); });
+    request.get('aws.json').end((err, res) => { if (err) throw err; cb(res.body); });
 }
 
 var layout = {
