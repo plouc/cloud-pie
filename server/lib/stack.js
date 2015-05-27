@@ -262,7 +262,6 @@ module.exports.fetch = function () {
                     vpcId:                     lb.VPCId,
                     createdAt:                 lb.CreatedTime,
                     instancesIds:              _.pluck(lb.Instances, 'InstanceId'),
-                    instances:                 [], // populated later after instance info fetching
                     scheme:                    lb.Scheme
                 };
             });
@@ -290,9 +289,6 @@ module.exports.fetch = function () {
                     def.reject(err);
                 } else {
                     props.loadBalancers.forEach(function (lb) {
-                        lb.instances = lb.instancesIds.map(function (instanceId) {
-                            return _.find(props.instances, { id: instanceId });
-                        });
                         var lbVpc = _.find(props.vpcs, { id: lb.vpcId });
                         if (lbVpc) {
                             lbVpc.loadBalancers.push(lb);

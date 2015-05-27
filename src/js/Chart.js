@@ -6,9 +6,9 @@ var Anchor  = require('./Anchor');
 
 // Layout setup
 var layout = {
-    vpc:         { spacing: 60, b: { t: 120, r: 20, b: 20, l: 20 } },
+    vpc:         { spacing: 60, b: { t: 120, r: 15, b: 15, l: 15 } },
     autoscaling: { size: 80, spacing: 10 },
-    subnet:      { spacing: 24, b: { t: 32,  r: 10, b: 10, l: 10 } },
+    subnet:      { spacing: 15, b: { t: 30,  r: 10, b: 10, l: 10 } },
     instance:    { size: 100, stateSize: 8, spacing: 10, padding: 8 },
     volume:      { size: 32, spacing: 6 }
 };
@@ -16,6 +16,7 @@ var layout = {
 module.exports = {
     create(el) {
         d3.select(el).append('svg')
+            // @todo compute required dimensions
             .attr('width',  3000)
             .attr('height', 3000)
         .append('g')
@@ -69,7 +70,7 @@ module.exports = {
                            i * layout.instance.spacing + layout.subnet.b.l,
                         y: subnet.layout.y + layout.subnet.b.t,
                         width:  layout.instance.size,
-                        height: layout.instance.size
+                        height: layout.instance.size,
                     };
 
                     instances.push(instance);
@@ -126,6 +127,35 @@ module.exports = {
                 y: 100
             }, {
                 distribute: 'vertical'
+            });
+
+            vpc.loadBalancers.forEach(lb => {
+                var lbInstances = [];
+                var instance;
+                var xs = [];
+                var ys = [];
+                lb.instancesIds.forEach(instanceId => {
+                    instance = _.find(instances, { id: instanceId });
+                    if (instance) {
+                        lbInstances.push(instance);
+                        xs.push(instance.layout.x + instance.layout.width / 2);
+                        ys.push(instance.layout.y - 30);
+                    }
+                });
+
+                lb.layout = {
+                    x: _.sum(xs) / xs.length,
+                    y: _.sum(ys) / ys.length
+                };
+
+                lb.paths = [];
+                lbInstances.forEach(instance => {
+                    lb.paths.push([
+                        { x: lb.layout.x, y: lb.layout.y },
+                        { x: instance.layout.x + instance.layout.width / 2, y: instance.layout.y - 35 },
+                        { x: instance.layout.x + instance.layout.width / 2, y: instance.layout.y }
+                    ]);
+                });
             });
         });
 
@@ -316,7 +346,9 @@ module.exports = {
         ;
 
 
-        var autoscalings = vpcsNodes.selectAll('.autoscaling').data(d => d.autoscalings, d => d.id);
+        var autoscalings = vpcsNodes.selectAll('.autoscaling')
+            .data(d => d.autoscalings, d => d.name)
+        ;
         autoscalings.enter().append('g')
             .attr('class', 'autoscaling')
             .each(function (d) {
@@ -415,6 +447,35 @@ module.exports = {
                 volume.on('click', d => {
                     clickHandler('volume', d);
                 });
+            })
+        ;
+
+        var loadBalancers = vpcsNodes.selectAll('.lb')
+            .data(d => d.loadBalancers, d => d.name)
+        ;
+        loadBalancers.enter().append('g')
+            .attr('class', 'lb')
+            .each(function (d) {
+                var _this = d3.select(this);
+
+                var line = d3.svg.line()
+                    .x(d => d.x)
+                    .y(d => d.y)
+                    .interpolate('step')
+                ;
+
+                d.paths.forEach(path => {
+                    _this.append('path').attr('class', 'lb__link').datum(path).attr('d', line);
+                });
+
+                _this.append('circle')
+                    .attr('class', 'lb__circle')
+                    .attr('transform', `translate(${ d.layout.x }, ${ d.layout.y })`)
+                    .attr('r', 10)
+                    .on('click', d => {
+                        clickHandler('lb', d);
+                    })
+                ;
             })
         ;
     }

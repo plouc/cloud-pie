@@ -1,13 +1,14 @@
-var React           = require('react');
-var Reflux          = require('reflux');
-var ItemStore       = require('./../stores/ItemStore');
-var AutoscalingItem = require('./items/AutoscalingItem.jsx');
-var InstanceItem    = require('./items/InstanceItem.jsx');
-var VpcItem         = require('./items/VpcItem.jsx');
-var SubnetItem      = require('./items/SubnetItem.jsx');
-var VolumeItem      = require('./items/VolumeItem.jsx');
-var IgwItem         = require('./items/IgwItem.jsx');
-var PeeringItem     = require('./items/PeeringItem.jsx');
+var React            = require('react');
+var Reflux           = require('reflux');
+var ItemStore        = require('./../stores/ItemStore');
+var AutoscalingItem  = require('./items/AutoscalingItem.jsx');
+var InstanceItem     = require('./items/InstanceItem.jsx');
+var VpcItem          = require('./items/VpcItem.jsx');
+var SubnetItem       = require('./items/SubnetItem.jsx');
+var VolumeItem       = require('./items/VolumeItem.jsx');
+var IgwItem          = require('./items/IgwItem.jsx');
+var PeeringItem      = require('./items/PeeringItem.jsx');
+var LoadBalancerItem = require('./items/LoadBalancerItem.jsx');
 
 module.exports = ItemInfo = React.createClass({
     mixins: [
@@ -63,6 +64,9 @@ module.exports = ItemInfo = React.createClass({
 
             case 'peering':
                 infoNode = <PeeringItem data={this.state.data}/>
+
+            case 'lb':
+                infoNode = <LoadBalancerItem data={this.state.data}/>
 
             default:
                 break;
