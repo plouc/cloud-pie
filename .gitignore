@@ -1,7 +1,6 @@
 .DS_Store
 node_modules
 .idea
-.sass-cache
-client/vendor
 aws.json
-dist/js/app.js
+dist/js
+dist/css
