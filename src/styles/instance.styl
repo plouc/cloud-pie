@@ -1,0 +1,34 @@
+@-webkit-keyframes flickerAnimation {
+  0%   { opacity: 1;    }
+  50%  { opacity: 0.35; }
+  100% { opacity: 1;    }
+}
+
+.instance
+  &__wrapper
+    stroke-width 2px
+    fill #273e45
+    stroke #273e45
+    cursor pointer
+
+  &._is-active
+    .instance__wrapper
+      stroke #132126
+      fill #2e484f
+
+  &:hover
+    .instance__wrapper
+      fill #2e484f
+
+  &__name
+    fill rgb(207, 244, 222)
+    font-size 11px
+
+  &__state
+    //-webkit-animation: flickerAnimation 2s infinite;
+
+    &--stopped
+      fill #da2c1b
+
+    &--running
+      fill #99f487

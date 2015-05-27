@@ -78,65 +78,31 @@ module.exports = {
     },
 
     autoscaling(el) {
-        var autoscaling = el.append('g').attr('transform', 'translate(-50, -50)');
+        var autoscaling = el.append('g')
+            .attr('class', 'autoscaling__icon')
+            .attr('transform', 'translate(-50, -50)')
+        ;
 
-        var autoscalingFront   = 'autoscaling__icon__front';
-        var autoscalingProfile = 'autoscaling__icon__profile';
+        autoscaling.append('circle')
+            .attr('class', 'autoscaling__icon__circle')
+            .attr('transform', 'translate(50, 50)')
+            .attr('r', 28)
+        ;
 
-        autoscaling.append('rect')
-            .attr('x', '37.845').attr('y', '33.88')
-            .attr('class', autoscalingProfile)
-            .attr('width', '4.498').attr('height', '2.545')
-        ;
-        autoscaling.append('rect')
-            .attr('x', '57.474').attr('y', '33.88')
-            .attr('class', autoscalingProfile)
-            .attr('width', '4.494').attr('height', '2.545')
-        ;
-        autoscaling.append('polygon')
-            .attr('class', autoscalingProfile)
-            .attr('points', '57.474,42.032 57.474,44.577 51.388,50.853 51.388,48.306')
-        ;
-        autoscaling.append('polygon')
-            .attr('class', autoscalingProfile)
-            .attr('points', '48.69,48.306 48.69,50.853 42.343,44.368 42.343,41.821')
-        ;
-        autoscaling.append('rect')
-            .attr('x', '68.888').attr('y', '54.202')
-            .attr('class', autoscalingProfile)
-            .attr('width', '10.422').attr('height', '2.547')
-        ;
-        autoscaling.append('rect')
-            .attr('x', '20.69').attr('y', '54.202')
-            .attr('class', autoscalingProfile)
-            .attr('width', '10.422').attr('height', '2.547')
-        ;
-        autoscaling.append('polygon')
-            .attr('class', autoscalingProfile)
-            .attr('points', '68.888,60.292 68.888,62.841 56.653,50.788 56.653,48.241')
-        ;
-        autoscaling.append('polygon')
-            .attr('class', autoscalingFront)
+        var symbol = autoscaling.append('g').attr('transform', 'scale(0.8) translate(12, 13)');
+
+        var autoscalingFrontClass = 'autoscaling__icon__front';
+
+        symbol.append('polygon')
+            .attr('class', autoscalingFrontClass)
             .attr('points', '31.112,36.333 43.347,48.374 31.112,60.292 31.112,54.202 20.69,54.202 20.69,42.411 31.112,42.411')
         ;
-        autoscaling.append('polygon')
-            .attr('class', autoscalingProfile)
-            .attr('points', '43.347,48.374 43.347,50.919 31.112,62.841 31.112,60.292')
-        ;
-        autoscaling.append('polygon')
-            .attr('class', autoscalingFront)
+        symbol.append('polygon')
+            .attr('class', autoscalingFrontClass)
             .attr('points', '68.888,36.333 68.888,42.425 79.31,42.425 79.31,54.202 68.888,54.202 68.888,60.292 56.653,48.241')
         ;
-        autoscaling.append('polygon')
-            .attr('class', autoscalingProfile)
-            .attr('points', '61.968,63.575 61.968,66.122 49.841,78.267 49.267,75.157')
-        ;
-        autoscaling.append('polygon')
-            .attr('class', autoscalingProfile)
-            .attr('points', '49.841,75.718 49.841,78.267 37.845,66.122 37.845,63.575')
-        ;
-        autoscaling.append('polygon')
-            .attr('class', autoscalingFront)
+        symbol.append('polygon')
+            .attr('class', autoscalingFrontClass)
             .attr('points', '49.974,21.733 61.968,33.88 57.474,33.88 57.474,42.032 51.388,48.306 57.474,54.753 57.474,63.575 61.968,63.575 49.841,75.718 37.845,63.575 42.343,63.575 42.343,54.845 48.69,48.306 42.343,41.821 42.343,33.88 37.845,33.88')
         ;
     }

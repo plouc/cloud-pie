@@ -1,0 +1,59 @@
+* {
+  box-sizing: border-box;
+}
+html, body {
+  font-family consolas, menlo, monaco, monospace
+  background #273e45
+  margin 0
+  height 100%
+}
+.schema {
+  margin: 20px;
+}
+
+@require "vpc.styl"
+@require "subnet.styl"
+@require "igw.styl"
+@require "instance.styl"
+@require "volume.styl"
+@require "item-info.styl"
+@require "info-panel.styl"
+
+.autoscaling__icon {
+  cursor: pointer;
+}
+.autoscaling__icon__circle {
+  fill: #b98b51;
+}
+.autoscaling__icon:hover .autoscaling__icon__circle {
+  fill: #e8b460;
+}
+.autoscaling__icon:hover .autoscaling__icon__front {
+  fill: #ffc768;
+}
+.autoscaling__icon__front {
+  fill: #e8b460;
+}
+.as__instance__link {
+  stroke: #38959a;
+  stroke-width: 2px;
+  fill: none;
+}
+
+
+.item-props
+  margin 15px 0
+  padding 0
+  list-style none
+
+  &__prop
+    padding 0 15px
+    margin-bottom 5px
+
+  &__key
+    display inline-block
+    color #446b76
+    margin-right 10px
+
+  &__value
+    color rgb(207, 244, 222)

@@ -2,6 +2,7 @@ var request = require('superagent');
 var d3      = require('d3/d3');
 var _       = require('lodash');
 var icons   = require('./icons');
+var Anchor  = require('./Anchor');
 
 var schema  = d3.select('#schema').append('svg')
     .attr('width',  3000)
@@ -12,7 +13,10 @@ var schema  = d3.select('#schema').append('svg')
 var tags    = d3.select('#tags');
 
 function loadData(cb) {
-    request.get('aws.json').end((err, res) => { if (err) throw err; cb(res.body); });
+    request.get('aws.json').end((err, res) => {
+        if (err) throw err;
+        cb(res.body);
+    });
 }
 
 var layout = {
@@ -82,20 +86,67 @@ function drawSchema(vpcs, peerings) {
                 x: i * (layout.autoscaling.size + layout.autoscaling.spacing) - layout.autoscaling.spacing + 60,
                 y: 60
             };
+            autoscaling.layout.anchor = new Anchor({
+                x: autoscaling.layout.x,
+                y: autoscaling.layout.y + 30
+            }, {
+                distribute: 'horizontal',
+                spacing:    10
+            });
+
             autoscaling.paths = [];
+            autoscaling.instances.forEach(instanceInfo => {
+                if (_.find(instances, { id: instanceInfo.id })) {
+                    autoscaling.layout.anchor.add();
+                }
+            });
             autoscaling.instances.forEach(instanceInfo => {
                 var instance = _.find(instances, { id: instanceInfo.id });
                 if (instance) {
+                    var start = autoscaling.layout.anchor.get();
                     autoscaling.paths.push([
-                        { x: autoscaling.layout.x,      y: autoscaling.layout.y },
-                        { x: autoscaling.layout.x, y: autoscaling.layout.y + 40 },
+                        start,
+                        { x: start.x, y: start.y + 15 },
                         { x: instance.layout.x + instance.layout.width / 2,    y: instance.layout.y - 20   },
                         { x: instance.layout.x + instance.layout.width / 2,    y: instance.layout.y    }
                     ]);
+                    autoscaling.layout.anchor.next();
                 }
             });
         });
+
+        vpc.peerings = {
+            requests: [],
+            accepts:  []
+        };
+
+        vpc.layout.peerAnchorReq = new Anchor({
+            x: vpc.layout.x + vpc.layout.width / 2,
+            y: 0
+        }, {
+            distribute: 'horizontal'
+        });
+        vpc.layout.peerAnchorAcc = new Anchor({
+            x: vpc.layout.x,
+            y: 100
+        }, {
+            distribute: 'vertical'
+        });
     });
+
+    peerings.forEach(peering => {
+        var requester = _.find(vpcs, { id: peering.requesterVpcInfo.id });
+        var accepter  = _.find(vpcs, { id: peering.accepterVpcInfo.id  });
+
+        if (requester && accepter) {
+            requester.peerings.requests.push(peering);
+            requester.layout.peerAnchorReq.add();
+
+            accepter.peerings.accepts.push(peering);
+            accepter.layout.peerAnchorAcc.add();
+        }
+    });
+
 
     var vpcsNodes = schema.selectAll('.vpc').data(vpcs);
     vpcsNodes.enter().append('g')
@@ -135,21 +186,27 @@ function drawSchema(vpcs, peerings) {
         })
     ;
 
+    var peeringOffsetV = 80;
     peerings.forEach(peering => {
         var requester = _.find(vpcs, { id: peering.requesterVpcInfo.id });
         var accepter  = _.find(vpcs, { id: peering.accepterVpcInfo.id  });
 
         if (requester && accepter) {
-            //console.log('requester', requester);
-            //console.log('accepter',  accepter);
+            var start = requester.layout.peerAnchorReq.get();
+            var end   = accepter.layout.peerAnchorAcc.get();
 
             var points = [
-                { x: requester.layout.x + requester.layout.width / 2, y: 0   },
-                { x: requester.layout.x + requester.layout.width / 2, y: -80 },
-                { x: accepter.layout.x - layout.vpc.spacing / 2,      y: -80 },
-                { x: accepter.layout.x - layout.vpc.spacing / 2,      y: 100 },
-                { x: accepter.layout.x,                               y: 100 }
+                start,
+                { x: start.x,                        y: start.y -peeringOffsetV },
+                { x: end.x - layout.vpc.spacing / 2, y: start.y -peeringOffsetV },
+                { x: end.x - layout.vpc.spacing / 2, y: end.y },
+                end
             ];
+
+            requester.layout.peerAnchorReq.next();
+            accepter.layout.peerAnchorAcc.next();
+
+            peeringOffsetV += 15;
 
             var line = d3.svg.line()
                 .x(d => d.x)
@@ -208,6 +265,9 @@ function drawSchema(vpcs, peerings) {
     autoscalings.enter().append('g')
         .attr('class', 'autoscaling')
         .each(function (d) {
+            d.showLinks = false;
+            var _this = d3.select(this);
+
             var line = d3.svg.line()
                 .x(d => d.x)
                 .y(d => d.y)
@@ -215,13 +275,22 @@ function drawSchema(vpcs, peerings) {
             ;
 
             d.paths.forEach(path => {
-                d3.select(this).append('path').attr('class', 'as__instance__link').datum(path).attr('d', line);
+                _this.append('path').attr('class', 'as__instance__link').datum(path).attr('d', line);
             });
+            _this.selectAll('.as__instance__link').style('display', 'none');
 
             var autoscaling = d3.select(this).append('g')
                 .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
             ;
             icons.autoscaling(autoscaling);
+
+            autoscaling.on('click', function (d) {
+                d.showLinks = !d.showLinks;
+                _this.selectAll('.as__instance__link').style('display', d.showLinks ? 'block' : 'none');
+            });
+            autoscaling.on('mouseenter', function (d) {
+                //console.log(d.name || d.id);
+            });
         })
     ;
 

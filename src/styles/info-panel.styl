@@ -1,0 +1,21 @@
+.info-panel
+  display block
+  position fixed
+  width 25%
+  height 100%
+  right -25%
+  top 0
+  bottom 0
+  background #1c3037
+  z-index 100
+  color #bbb
+  font-size 14px
+  box-shadow 0 0 5px rgba(0, 0, 0, 0.5);
+
+  transform translate3d(100%, 0, 0)
+
+  -webkit-transition transform 400ms
+
+  &._is-opened
+    transform translate3d(-100%, 0, 0)
+
