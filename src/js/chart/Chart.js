@@ -1,18 +1,19 @@
-var request = require('superagent');
-var d3      = require('d3/d3');
-var _       = require('lodash');
-var icons   = require('./icons');
-var Anchor  = require('./Anchor');
-var Box     = require('./Box');
-var Point   = require('./Point');
+var d3     = require('d3/d3');
+var _      = require('lodash');
+var icons  = require('./icons');
+var Anchor = require('./Anchor');
+var Box    = require('./Box');
+var Point  = require('./Point');
+var Path   = require('./Path');
 
 // Layout setup
 var layout = {
     vpc:         { spacing: 60, b: { t: 120, r: 15, b: 15, l: 15 } },
     autoscaling: { size: 80, spacing: 10 },
     subnet:      { spacing: 15, b: { t: 30,  r: 10, b: 10, l: 10 } },
-    instance:    { size: 100, stateSize: 8, spacing: 10, padding: 8 },
-    volume:      { size: 32, spacing: 6 }
+    instance:    { borderRadius: 0, size: 100, stateSize: 8, spacing: 3, padding: 8, indicatorWidth: 4 },
+    volume:      { size: 32, spacing: 6 },
+    lb:          { size: 32 }
 };
 
 module.exports = {
@@ -107,8 +108,8 @@ module.exports = {
                         autoscaling.paths.push([
                             start,
                             { x: start.x, y: start.y + 15 },
-                            { x: instance.box.oX + instance.box.width / 2,    y: instance.box.oY - 20   },
-                            { x: instance.box.oX + instance.box.width / 2,    y: instance.box.oY    }
+                            { x: instance.box.origin.x + instance.box.width / 2,    y: instance.box.origin.y - 20   },
+                            { x: instance.box.origin.x + instance.box.width / 2,    y: instance.box.origin.y    }
                         ]);
                         autoscaling.layout.anchor.next();
                     }
@@ -141,20 +142,17 @@ module.exports = {
                     instance = _.find(instances, { id: instanceId });
                     if (instance) {
                         lbInstances.push(instance);
-                        instancePoints.push(instance.box.origin);
+                        instancePoints.push(instance.box.center);
                     }
                 });
 
                 lb.box = new Box();
-                lb.box.setOrigin(Point.centerFromPoints(instancePoints));
+                lb.box.setDimensions(layout.lb.size, layout.lb.size);
+                lb.box.setOrigin(Point.centerFromPoints(instancePoints).offset(layout.lb.size * -0.5, -layout.lb.size * -0.5));
 
                 lb.paths = [];
                 lbInstances.forEach(instance => {
-                    lb.paths.push([
-                        { x: lb.box.oX, y: lb.box.oY },
-                        { x: instance.box.oX + instance.box.width / 2, y: instance.box.oY - 35 },
-                        { x: instance.box.oX + instance.box.width / 2, y: instance.box.oY }
-                    ]);
+                    lb.paths.push(Path.fromBoxes(lb.box, instance.box, 15, 15).points);
                 });
             });
         });
@@ -386,7 +384,7 @@ module.exports = {
 
         var instances = subnets.selectAll('.instance').data(d => d.instances);
         instances.enter().append('g')
-            .attr('transform', instance => `translate(${ instance.box.oX }, ${ instance.box.oY })`)
+            .attr('transform', instance => `translate(${ instance.box.origin.x }, ${ instance.box.origin.y })`)
             .attr('class', 'instance')
             .each(function (instance) {
                 var instanceEl = d3.select(this);
@@ -394,7 +392,7 @@ module.exports = {
                     .attr('class', 'instance__wrapper')
                     .attr('width',  instance.box.width)
                     .attr('height', instance.box.height)
-                    .attr({ rx: 3, ry: 3 })
+                    .attr({ rx: layout.instance.borderRadius, ry: layout.instance.borderRadius })
                 ;
 
                 icon.on('click', function (instance) {
@@ -413,6 +411,12 @@ module.exports = {
                     .attr('x', 24)
                     .attr('y', 20)
                     .text(instance.tags.name ? instance.tags.name : instance.id)
+                ;
+
+                instanceEl.append('rect')
+                    .attr('class', 'instance__indicator')
+                    .attr('width',  layout.instance.indicatorWidth)
+                    .attr('height', instance.box.height)
                 ;
             })
         ;
@@ -461,22 +465,28 @@ module.exports = {
                 var line = d3.svg.line()
                     .x(d => d.x)
                     .y(d => d.y)
-                    .interpolate('bundle')
+                    .interpolate('linear')
                 ;
 
                 lb.paths.forEach(path => {
                     lbEl.append('path').attr('class', 'lb__link').datum(path).attr('d', line);
                 });
 
-                lbEl.append('circle')
+                lbEl.append('rect')
                     .attr('class', 'lb__circle')
-                    .attr('transform', `translate(${ lb.box.oX }, ${ lb.box.oY })`)
-                    .attr('r', 10)
+                    .attr('transform', `translate(${ lb.box.origin.x }, ${ lb.box.origin.y })`)
+                    .attr('rx', 3)
+                    .attr('width', lb.box.width)
+                    .attr('height', lb.box.height)
                     .on('click', lb => {
                         clickHandler('lb', lb);
                     })
                 ;
             })
+        ;
+
+        loadBalancers
+            .attr('class', lb => `lb${ lb.active ? ' _is-active' : '' }`)
         ;
     }
 };

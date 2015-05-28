@@ -5,20 +5,29 @@
 }
 
 .instance
+  &__indicator
+    fill $instance-indicator-background
+
   &__wrapper
-    stroke-width 2px
-    fill #273e45
-    stroke #273e45
+    stroke-width $instance-border-width
+    fill $instance-background
+    stroke $instance-border-color
     cursor pointer
 
   &._is-active
-    .instance__wrapper
-      stroke #132126
-      fill #2e484f
+    .instance
+      &__wrapper
+        stroke $instance-border-color-active
+        fill $instance-background-active
+
+      &__indicator
+        fill $instance-indicator-background-active
 
   &:hover
-    .instance__wrapper
-      fill #2e484f
+    .instance
+      &__wrapper
+        fill $instance-background-hover
+        stroke $instance-border-color-hover
 
   &__name
     fill rgb(207, 244, 222)

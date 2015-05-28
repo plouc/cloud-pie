@@ -2,16 +2,19 @@ var Point = require('./Point');
 
 class Box {
     constructor() {
-        this.setOrigin(new Point(0, 0));
         this.center = new Point(0, 0);
+        this.setOrigin(new Point(0, 0));
         this.width  = 0;
         this.height = 0;
     }
 
     setOrigin(origin) {
         this.origin = origin;
-        this.oX = this.origin.x;
-        this.oY = this.origin.y;
+
+        this.center.setXY(
+            this.origin.x + this.width  / 2,
+            this.origin.y + this.height / 2
+        );
 
         return this;
     }
@@ -20,17 +23,49 @@ class Box {
         this.width  = width;
         this.height = height;
 
+        this.center.setXY(
+            this.origin.x + this.width  / 2,
+            this.origin.y + this.height / 2
+        );
+
         return this;
+    }
+
+    anchor(direction) {
+        switch (direction) {
+            case 'top':
+                return new Point(this.center.x, this.origin.y);
+                break;
+
+            case 'right':
+                return new Point(this.origin.x + this.width, this.center.y);
+                break;
+
+            case 'bottom':
+                return new Point(this.center.x, this.origin.y + this.height);
+                break;
+
+            case 'left':
+                return new Point(this.origin.x, this.center.y);
+                break;
+
+            default:
+                throw `Invalid direction ${ direction }`;
+        }
     }
 
     setWidth(width) {
         this.width  = width;
+
+        this.center.x = this.origin.x + this.width / 2;
 
         return this;
     }
 
     setHeight(height) {
         this.height = height;
+
+        this.center.y = this.origin.y + this.height / 2;
 
         return this;
     }
