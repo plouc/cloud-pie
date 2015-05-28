@@ -8,10 +8,10 @@ var Path   = require('./Path');
 
 // Layout setup
 var layout = {
-    vpc:         { spacing: 60, b: { t: 120, r: 15, b: 15, l: 15 } },
+    vpc:         { borderRadius: 4, spacing: 60, b: { t: 40, r: 20, b: 20, l: 20 } },
     autoscaling: { size: 80, spacing: 10 },
-    subnet:      { spacing: 15, b: { t: 30,  r: 10, b: 10, l: 10 } },
-    instance:    { borderRadius: 0, size: 100, stateSize: 8, spacing: 3, padding: 8, indicatorWidth: 4 },
+    subnet:      { borderRadius: 2, spacing: 20, b: { t: 30,  r: 10, b: 10, l: 10 } },
+    instance:    { borderRadius: 0, size: 100, stateSize: 8, spacing: 7, padding: 8, indicatorWidth: 4 },
     volume:      { size: 32, spacing: 6 },
     lb:          { size: 32 }
 };
@@ -180,7 +180,7 @@ module.exports = {
                     .attr('class', 'vpc__wrapper')
                     .attr('width', d.layout.width)
                     .attr('height', d.layout.height)
-                    .attr({ rx: 5, ry: 5 })
+                    .attr({ rx: layout.vpc.borderRadius, ry: layout.vpc.borderRadius })
                 ;
 
                 var vpcIcon = vpc.append('g').attr('transform', 'translate(55, 0)');
@@ -314,7 +314,7 @@ module.exports = {
                     .attr('class', 'subnet__wrapper')
                     .attr('width',  d.layout.width)
                     .attr('height', d.layout.height)
-                    .attr({ rx: 3, ry: 3 })
+                    .attr({ rx: layout.subnet.borderRadius, ry: layout.subnet.borderRadius })
                     .on('click', function (d) {
                         clickHandler('subnet', d);
                     })
@@ -343,7 +343,7 @@ module.exports = {
             .attr('class', d => `subnet${ d.active ? ' _is-active' : '' }`)
         ;
 
-
+        /*
         var autoscalings = vpcsNodes.selectAll('.autoscaling')
             .data(d => d.autoscalings, d => d.name)
         ;
@@ -380,6 +380,7 @@ module.exports = {
                 });
             })
         ;
+        */
 
 
         var instances = subnets.selectAll('.instance').data(d => d.instances);

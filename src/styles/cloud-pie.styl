@@ -5,10 +5,19 @@
 }
 html, body {
   font-family consolas, menlo, monaco, monospace
-  background $main-background
-  margin 0
-  height 100%
+  //background $main-background
+  background: #32a5b3; /* Old browsers */
+  background: -moz-linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left bottom, right top, color-stop(0%, #32a5b3), color-stop(100%, #73c9ae)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* IE10+ */
+  background: linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* W3C */
 }
+
+margin 0
+  height 100%
+
 .schema {
   margin: 20px;
 }
@@ -72,8 +81,9 @@ html, body {
 
   &__key
     display inline-block
-    color #446b76
+    font-weight 800
+    color #b8c39e
     margin-right 10px
 
   &__value
-    color rgb(207, 244, 222)
+    color #41817a

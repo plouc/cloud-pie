@@ -2,15 +2,19 @@
   &__label__text
     font-weight 700
     font-size 13px
+    fill $subnet-text-color
 
   &__zone
     font-size 13px
+    fill $subnet-text-color
 
   &__wrapper
     fill $subnet-background
+    stroke $subnet-border-color
+    stroke-width $subnet-border-width
 
   &._is-active
     .subnet
       &__wrapper
-        stroke #a6cab4
-        stroke-width 1px
+        fill $subnet-background-active
+        stroke $subnet-border-color-active

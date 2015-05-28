@@ -1,6 +1,8 @@
 .vpc
   &__wrapper
     fill $vpc-background
+    stroke $vpc-border-color
+    stroke-width $vpc-border-width
 
   &__label__background
     fill rgb(169, 223, 196)
@@ -25,10 +27,11 @@
   &._is-active
     .vpc
       &__label__text
-        fill #32dea8
+        fill #63b597
 
       &__wrapper
-        fill rgb(207, 244, 222)
+        fill $vpc-background-active
+        stroke $vpc-border-color-active
 
       &__icon
         &__front

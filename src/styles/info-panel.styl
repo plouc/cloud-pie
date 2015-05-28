@@ -8,13 +8,26 @@
   bottom 0
   background $info-panel-background
   z-index 100
-  color #bbb
+  color #41817a
   font-size 14px
-  box-shadow 0 0 5px rgba(0, 0, 0, 0.5);
+  box-shadow 0 0 3px rgba(0, 0, 0, 0.5);
 
   transform translate3d(100%, 0, 0)
 
   -webkit-transition transform 400ms
+
+  &__close
+    position absolute
+    top   10px
+    right 15px
+    display block
+    font-size 12px
+    padding 3px 7px
+    background #d2dac4
+    border-radius 2px
+    cursor pointer
+    &:hover
+      background $info-panel-background
 
   &._is-opened
     transform translate3d(-100%, 0, 0)

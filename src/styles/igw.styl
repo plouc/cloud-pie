@@ -1,25 +1,25 @@
 .igw
   cursor pointer
   &__cloud
-    fill rgb(207, 244, 222)
+    fill $igw-icon-symbol
 
   &__circle,
   &__cloud__inside
-    fill #588da2
+    fill $igw-icon-background
 
   &__label__text
-    fill #67a0b6
+    fill $igw-text-color
     font-family consolas, menlo, monaco, monospace
     font-size 12px
 
   &._is-active
     .igw
       &__cloud
-        fill #fff
+        fill $igw-icon-symbol-active
 
       &__circle,
       &__cloud__inside
-        fill #36749b
+        fill $igw-icon-background-active
 
       &__label__text
-        fill #78b8d0
+        fill $igw-text-color-active

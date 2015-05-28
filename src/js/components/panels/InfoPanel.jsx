@@ -39,7 +39,7 @@ module.exports = InfoPanel = React.createClass({
 
         return (
             <div className={classes}>
-                <div onClick={this.onCloseClick}>close</div>
+                <div className="info-panel__close" onClick={this.onCloseClick}>close</div>
                 <ItemInfo/>
             </div>
         );
