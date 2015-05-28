@@ -1,4 +1,4 @@
-var chart = require('./../Chart');
+var chart = require('./../chart/Chart');
 var React = require('react');
 var _     = require('lodash');
 

@@ -3,6 +3,8 @@ var d3      = require('d3/d3');
 var _       = require('lodash');
 var icons   = require('./icons');
 var Anchor  = require('./Anchor');
+var Box     = require('./Box');
+var Point   = require('./Point');
 
 // Layout setup
 var layout = {
@@ -64,14 +66,16 @@ module.exports = {
                 };
 
                 subnet.instances.forEach((instance, i) => {
-                    instance.layout = {
-                        x: subnet.layout.x +
-                           i * layout.instance.size +
-                           i * layout.instance.spacing + layout.subnet.b.l,
-                        y: subnet.layout.y + layout.subnet.b.t,
-                        width:  layout.instance.size,
-                        height: layout.instance.size,
-                    };
+                    instance.box = new Box();
+                    instance.box
+                        .setOrigin(new Point(
+                            subnet.layout.x +
+                            i * layout.instance.size +
+                            i * layout.instance.spacing + layout.subnet.b.l,
+                            subnet.layout.y + layout.subnet.b.t
+                        ))
+                        .setDimensions(layout.instance.size, layout.instance.size)
+                    ;
 
                     instances.push(instance);
                 });
@@ -103,8 +107,8 @@ module.exports = {
                         autoscaling.paths.push([
                             start,
                             { x: start.x, y: start.y + 15 },
-                            { x: instance.layout.x + instance.layout.width / 2,    y: instance.layout.y - 20   },
-                            { x: instance.layout.x + instance.layout.width / 2,    y: instance.layout.y    }
+                            { x: instance.box.oX + instance.box.width / 2,    y: instance.box.oY - 20   },
+                            { x: instance.box.oX + instance.box.width / 2,    y: instance.box.oY    }
                         ]);
                         autoscaling.layout.anchor.next();
                     }
@@ -132,28 +136,24 @@ module.exports = {
             vpc.loadBalancers.forEach(lb => {
                 var lbInstances = [];
                 var instance;
-                var xs = [];
-                var ys = [];
+                var instancePoints = [];
                 lb.instancesIds.forEach(instanceId => {
                     instance = _.find(instances, { id: instanceId });
                     if (instance) {
                         lbInstances.push(instance);
-                        xs.push(instance.layout.x + instance.layout.width / 2);
-                        ys.push(instance.layout.y - 30);
+                        instancePoints.push(instance.box.origin);
                     }
                 });
 
-                lb.layout = {
-                    x: _.sum(xs) / xs.length,
-                    y: _.sum(ys) / ys.length
-                };
+                lb.box = new Box();
+                lb.box.setOrigin(Point.centerFromPoints(instancePoints));
 
                 lb.paths = [];
                 lbInstances.forEach(instance => {
                     lb.paths.push([
-                        { x: lb.layout.x, y: lb.layout.y },
-                        { x: instance.layout.x + instance.layout.width / 2, y: instance.layout.y - 35 },
-                        { x: instance.layout.x + instance.layout.width / 2, y: instance.layout.y }
+                        { x: lb.box.oX, y: lb.box.oY },
+                        { x: instance.box.oX + instance.box.width / 2, y: instance.box.oY - 35 },
+                        { x: instance.box.oX + instance.box.width / 2, y: instance.box.oY }
                     ]);
                 });
             });
@@ -386,39 +386,39 @@ module.exports = {
 
         var instances = subnets.selectAll('.instance').data(d => d.instances);
         instances.enter().append('g')
-            .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
+            .attr('transform', instance => `translate(${ instance.box.oX }, ${ instance.box.oY })`)
             .attr('class', 'instance')
-            .each(function (d) {
-                var instance = d3.select(this);
-                var icon = instance.append('rect')
+            .each(function (instance) {
+                var instanceEl = d3.select(this);
+                var icon = instanceEl.append('rect')
                     .attr('class', 'instance__wrapper')
-                    .attr('width',  d.layout.width)
-                    .attr('height', d.layout.height)
+                    .attr('width',  instance.box.width)
+                    .attr('height', instance.box.height)
                     .attr({ rx: 3, ry: 3 })
                 ;
 
-                icon.on('click', function (d) {
-                    clickHandler('instance', d);
+                icon.on('click', function (instance) {
+                    clickHandler('instance', instance);
                 });
 
-                instance.append('circle')
-                    .attr('class', `instance__state instance__state--${ d.state }`)
+                instanceEl.append('circle')
+                    .attr('class', `instance__state instance__state--${ instance.state }`)
                     .attr('r', layout.instance.stateSize / 2)
                     .attr('cx', 12)
                     .attr('cy', 15)
                 ;
 
-                instance.append('text')
+                instanceEl.append('text')
                     .attr('class', 'instance__name')
                     .attr('x', 24)
                     .attr('y', 20)
-                    .text(d.tags.name ? d.tags.name : d.id)
+                    .text(instance.tags.name ? instance.tags.name : instance.id)
                 ;
             })
         ;
 
         instances
-            .attr('class', d => `instance${ d.active ? ' _is-active' : '' }`)
+            .attr('class', instance => `instance${ instance.active ? ' _is-active' : '' }`)
         ;
 
         var volumes = instances.selectAll('.volume').data(d => d.blockDeviceMappings);
@@ -455,25 +455,25 @@ module.exports = {
         ;
         loadBalancers.enter().append('g')
             .attr('class', 'lb')
-            .each(function (d) {
-                var _this = d3.select(this);
+            .each(function (lb) {
+                var lbEl = d3.select(this);
 
                 var line = d3.svg.line()
                     .x(d => d.x)
                     .y(d => d.y)
-                    .interpolate('step')
+                    .interpolate('bundle')
                 ;
 
-                d.paths.forEach(path => {
-                    _this.append('path').attr('class', 'lb__link').datum(path).attr('d', line);
+                lb.paths.forEach(path => {
+                    lbEl.append('path').attr('class', 'lb__link').datum(path).attr('d', line);
                 });
 
-                _this.append('circle')
+                lbEl.append('circle')
                     .attr('class', 'lb__circle')
-                    .attr('transform', `translate(${ d.layout.x }, ${ d.layout.y })`)
+                    .attr('transform', `translate(${ lb.box.oX }, ${ lb.box.oY })`)
                     .attr('r', 10)
-                    .on('click', d => {
-                        clickHandler('lb', d);
+                    .on('click', lb => {
+                        clickHandler('lb', lb);
                     })
                 ;
             })
