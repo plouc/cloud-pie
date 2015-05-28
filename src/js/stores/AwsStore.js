@@ -16,6 +16,9 @@ function resetActive() {
         if (vpc.internetGateway) {
             vpc.internetGateway.active = false;
         }
+        vpc.loadBalancers.forEach(lb => {
+            lb.active = false;
+        });
     });
 
     _stack.loadBalancers.forEach(lb => {
@@ -90,6 +93,14 @@ module.exports = AwsStore = Reflux.createStore({
                 break;
 
             case 'volume':
+                break;
+
+            case 'lb':
+                _stack.vpcs.forEach(vpc => {
+                    vpc.loadBalancers.forEach(lb => {
+                        lb.active = lb.name === data.name;
+                    });
+                });
                 break;
 
             default:
