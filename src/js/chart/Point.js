@@ -7,13 +7,16 @@ class Point {
     }
 }
 
+/**
+ * Compute center for given points.
+ *
+ * @param {Array} points
+ * @returns {Point}
+ */
 Point.centerFromPoints = function (points) {
-    var xs = _.pluck(points, 'x');
-    var ys = _.pluck(points, 'y');
-
     return new Point(
-        _.sum(xs) / points.length,
-        _.sum(ys) / points.length
+        _.sum(_.pluck(points, 'x')) / points.length,
+        _.sum(_.pluck(points, 'y')) / points.length
     );
 };
 
