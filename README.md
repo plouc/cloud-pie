@@ -1,4 +1,4 @@
-![preview](https://raw.githubusercontent.com/plouc/cloud-pie/master/graphic/cloud-pie-logotype.svg)
+![preview](https://plouc.github.io/cloud-pie/graphic/cloud-pie-logotype.svg)
 
 ## Install
 
