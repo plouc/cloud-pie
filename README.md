@@ -1,3 +1,5 @@
+![preview](https://raw.githubusercontent.com/plouc/cloud-pie/graphic/cloud-pie-logotype.png)
+
 # CLOUD-PIE
 
 ## Install

@@ -53,22 +53,40 @@ margin 0
 
 
 .lb
-  &__circle
-    fill #38959a
-    cursor pointer
-
   &__link
-    stroke #38959a
+    stroke $lb-link-color
     stroke-width 2px
     fill none
 
+  &__icon
+    cursor pointer
+
+    &__background
+      fill $lb-icon-background
+      stroke $lb-icon-border-color
+      stroke-width $lb-icon-border-width
+      -webkit-filter drop-shadow(-5px -5px 5px #000)
+
+    &__symbol
+      fill $lb-icon-symbol-color
+
   &:hover
     .lb
-      &__circle
-        fill #43c3c8
-
       &__link
-        stroke #43c3c8
+        stroke $lb-link-color-hover
+      &__icon
+        &__background
+          fill $lb-icon-background-hover
+          stroke $lb-icon-border-color-hover
+
+  &._is-active
+    .lb
+      &__link
+        stroke $lb-link-color-active
+      &__icon
+        &__background
+          fill $lb-icon-background-active
+          stroke $lb-icon-border-color-active
 
 .item-props
   margin 15px 0

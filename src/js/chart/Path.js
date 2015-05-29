@@ -48,7 +48,7 @@ Path.fromBoxes = function (boxA, boxB, offsetA, offsetB) {
             if (offsetB > 0) { oB.x = offsetB;  }
         }
     } else {
-        if (dy > 0) {
+        if (dy >= 0) {
             direction = 'bottom';
             if (offsetA > 0) { oA.y = offsetA;  }
             if (offsetB > 0) { oB.y = -offsetB; }

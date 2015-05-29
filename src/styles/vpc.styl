@@ -16,13 +16,20 @@
   &__icon
     cursor pointer
     &__front
-      fill #63b597
+      fill $vpc-icon-front
 
     &__left
-      fill #4C9378
+      fill $vpc-icon-left
 
     &__top
-      fill #87e9c1
+      fill $vpc-icon-top
+
+    &__bottom
+      fill $vpc-icon-bottom
+
+    &__outline
+      fill none
+      stroke none
 
   &._is-active
     .vpc
@@ -35,13 +42,20 @@
 
       &__icon
         &__front
-          fill #1faf89
+          fill $vpc-icon-front
 
         &__left
-          fill #14916e
+          fill $vpc-icon-left
 
         &__top
-          fill #32dea8
+          fill $vpc-icon-top
+
+        &__bottom
+          fill $vpc-icon-bottom
+
+        &__outline
+          fill none
+          stroke none
 
   &__peering
     &__path

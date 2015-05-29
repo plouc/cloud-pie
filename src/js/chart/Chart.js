@@ -8,7 +8,7 @@ var Path   = require('./Path');
 
 // Layout setup
 var layout = {
-    vpc:         { borderRadius: 4, spacing: 60, b: { t: 40, r: 20, b: 20, l: 20 } },
+    vpc:         { borderRadius: 4, spacing: 60, b: { t: 60, r: 20, b: 20, l: 20 } },
     autoscaling: { size: 80, spacing: 10 },
     subnet:      { borderRadius: 2, spacing: 20, b: { t: 30,  r: 10, b: 10, l: 10 } },
     instance:    { borderRadius: 0, size: 100, stateSize: 8, spacing: 7, padding: 8, indicatorWidth: 4 },
@@ -183,12 +183,13 @@ module.exports = {
                     .attr({ rx: layout.vpc.borderRadius, ry: layout.vpc.borderRadius })
                 ;
 
-                var vpcIcon = vpc.append('g').attr('transform', 'translate(55, 0)');
+                var vpcIcon = vpc.append('g').attr('transform', 'translate(36, 30)');
                 icons.vpc(vpcIcon);
                 vpcIcon.append('text')
                     .attr('class', 'vpc__label__text')
-                    .attr('text-anchor', 'middle')
-                    .attr('y', -46)
+                    .attr('text-anchor', 'start')
+                    .attr('x', 24)
+                    .attr('y', 5)
                     .text(d.tags.name ? d.tags.name : d.id)
                 ;
 
@@ -466,23 +467,22 @@ module.exports = {
                 var line = d3.svg.line()
                     .x(d => d.x)
                     .y(d => d.y)
-                    .interpolate('linear')
+                    .interpolate('basis')
                 ;
 
                 lb.paths.forEach(path => {
                     lbEl.append('path').attr('class', 'lb__link').datum(path).attr('d', line);
                 });
 
-                lbEl.append('rect')
-                    .attr('class', 'lb__circle')
-                    .attr('transform', `translate(${ lb.box.origin.x }, ${ lb.box.origin.y })`)
-                    .attr('rx', 3)
-                    .attr('width', lb.box.width)
-                    .attr('height', lb.box.height)
+                //lb.append('text').text(d => d.name);
+
+                var icon = lbEl.append('g')
+                    .attr('transform', `translate(${ lb.box.center.x }, ${ lb.box.center.y })`)
                     .on('click', lb => {
                         clickHandler('lb', lb);
                     })
                 ;
+                icons.loadBalancer(icon);
             })
         ;
 
