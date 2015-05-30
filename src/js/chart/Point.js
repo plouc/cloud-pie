@@ -7,6 +7,13 @@ class Point {
     }
 
     /**
+     * @returns {Point}
+     */
+    clone() {
+        return new Point(this.x, this.y);
+    }
+
+    /**
      * @param {Number} x
      * @param {Number} y
      *

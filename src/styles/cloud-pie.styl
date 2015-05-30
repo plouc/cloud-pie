@@ -30,26 +30,32 @@ margin 0
 @require "item-info.styl"
 @require "info-panel.styl"
 
-.autoscaling__icon {
-  cursor: pointer;
-}
-.autoscaling__icon__circle {
-  fill: #b98b51;
-}
-.autoscaling__icon:hover .autoscaling__icon__circle {
-  fill: #e8b460;
-}
-.autoscaling__icon:hover .autoscaling__icon__front {
-  fill: #ffc768;
-}
-.autoscaling__icon__front {
-  fill: #e8b460;
-}
-.as__instance__link {
-  stroke: #38959a;
-  stroke-width: 2px;
-  fill: none;
-}
+
+.autoscaling
+  &__icon
+    cursor pointer
+
+    &__circle
+      fill $autoscaling-icon-background
+      stroke $autoscaling-icon-border-color
+      stroke-width $autoscaling-icon-border-width
+
+    &__front
+      fill $autoscaling-icon-symbol-color
+
+  &:hover
+    .autoscaling__icon
+      &__circle
+        fill $autoscaling-icon-background-hover
+
+      &__front
+        fill $autoscaling-icon-symbol-color-hover
+
+
+.as__instance__link
+  stroke $autoscaling-link-color
+  stroke-width 2px
+  fill none
 
 
 .lb

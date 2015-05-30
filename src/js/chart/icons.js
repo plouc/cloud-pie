@@ -86,27 +86,21 @@ module.exports = {
             .attr('transform', 'translate(-50, -50)')
         ;
 
-        autoscaling.append('circle')
-            .attr('class', 'autoscaling__icon__circle')
-            .attr('transform', 'translate(50, 50)')
-            .attr('r', 28)
-        ;
-
-        var symbol = autoscaling.append('g').attr('transform', 'scale(0.8) translate(12, 13)');
+        autoscaling.append('circle').attr('class', 'autoscaling__icon__circle').attr('cx', 50).attr('cy', 50).attr('r', 18);
 
         var autoscalingFrontClass = 'autoscaling__icon__front';
 
-        symbol.append('polygon')
+        autoscaling.append('polygon')
             .attr('class', autoscalingFrontClass)
-            .attr('points', '31.112,36.333 43.347,48.374 31.112,60.292 31.112,54.202 20.69,54.202 20.69,42.411 31.112,42.411')
+            .attr('points', '41.1,44.2 46.9,49.8 41.1,55.4 41.1,52.6 36.2,52.6 36.2,47 41.1,47')
         ;
-        symbol.append('polygon')
+        autoscaling.append('polygon')
             .attr('class', autoscalingFrontClass)
-            .attr('points', '68.888,36.333 68.888,42.425 79.31,42.425 79.31,54.202 68.888,54.202 68.888,60.292 56.653,48.241')
+            .attr('points', '58.9,44.2 58.9,47 63.8,47 63.8,52.6 58.9,52.6 58.9,55.4 53.1,49.8')
         ;
-        symbol.append('polygon')
+        autoscaling.append('polygon')
             .attr('class', autoscalingFrontClass)
-            .attr('points', '49.974,21.733 61.968,33.88 57.474,33.88 57.474,42.032 51.388,48.306 57.474,54.753 57.474,63.575 61.968,63.575 49.841,75.718 37.845,63.575 42.343,63.575 42.343,54.845 48.69,48.306 42.343,41.821 42.343,33.88 37.845,33.88')
+            .attr('points', '50,37.3 55.6,43 53.5,43 53.5,46.8 50.7,49.8 53.5,52.8 53.5,57 55.6,57 49.9,62.7 44.3,57 46.4,57 46.4,52.9 49.4,49.8 46.4,46.7 46.4,43 44.3,43')
         ;
     },
 
@@ -116,7 +110,7 @@ module.exports = {
             .attr('transform', 'translate(-50, -50)')
         ;
 
-        lb.append('path').attr('class', 'lb__icon__background').attr('d', 'M50.6,30.9c10.6,0.3,19,9.1,18.7,19.7c-0.3,10.5-9.2,18.8-19.8,18.5c-10.6-0.3-19-9.1-18.7-19.7C31.1,38.9,39.9,30.6,50.6,30.9z');
-        lb.append('path').attr('class', 'lb__icon__symbol').attr('d', 'M61.7,44H56v-1.1l-1.8,2.2l-0.8-1.2L45.3,49h6.8v-1.2l3.8,1.4v-2.1h5.7v5.7H56v-2.1l-3.8,1.4V51h-6.8l8.1,5.1l0.7-1.2l1.8,2.3V56h5.7v5.7H56v-2.3l-4-1l0.5-1.1l-9.9-6.4v3.8h-6.4v-9.5h6.4v3.8l10-6.4L52,41.5l4-1v-2.3h5.7V44z');
+        lb.append('circle').attr('class', 'lb__icon__background').attr('cx', 50).attr('cy', 50).attr('r', 18);
+        lb.append('path').attr('class', 'lb__icon__symbol').attr('d', 'M58.7,45.2h-4.6v-0.9l-1.5,1.8l-0.6-1l-6.5,4.1H51v-1l3.1,1.1v-1.7h4.6v4.6h-4.5v-1.7l-3.1,1.1v-0.9h-5.5l6.5,4.1l0.6-1l1.5,1.9v-1h4.6v4.6h-4.6v-1.9l-3.2-0.8l0.4-0.9l-8-5.2v3.1h-5.2v-7.7h5.2v3.1l8.1-5.2l-0.5-0.9l3.2-0.8v-1.9h4.6V45.2z');
     }
 };

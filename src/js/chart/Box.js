@@ -3,7 +3,7 @@ var Point = require('./Point');
 class Box {
     constructor() {
         this.center = new Point(0, 0);
-        this.setOrigin(new Point(0, 0));
+        this.origin = new Point(0, 0);
         this.width  = 0;
         this.height = 0;
     }
@@ -14,6 +14,17 @@ class Box {
         this.center.setXY(
             this.origin.x + this.width  / 2,
             this.origin.y + this.height / 2
+        );
+
+        return this;
+    }
+
+    setCenter(center) {
+        this.center = center;
+
+        this.origin.setXY(
+            this.center.x - this.width  / 2,
+            this.center.y - this.height / 2
         );
 
         return this;

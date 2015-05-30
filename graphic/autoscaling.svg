@@ -4,7 +4,10 @@
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="100px" height="100px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
 <circle fill="#F58536" cx="50" cy="50" r="18"/>
-<path fill="#FFFFFF" d="M58.7,45.2h-4.6v-0.9l-1.5,1.8l-0.6-1l-6.5,4.1H51v-1l3.1,1.1v-1.7h4.6v4.6h-4.5v-1.7l-3.1,1.1v-0.9h-5.5
-	l6.5,4.1l0.6-1l1.5,1.9v-1h4.6v4.6h-4.6v-1.9l-3.2-0.8l0.4-0.9l-8-5.2v3.1h-5.2v-7.7h5.2v3.1l8.1-5.2l-0.5-0.9l3.2-0.8v-1.9h4.6
-	V45.2z"/>
+<g>
+	<polygon fill="#FFFFFF" points="41.1,44.2 46.9,49.8 41.1,55.4 41.1,52.6 36.2,52.6 36.2,47 41.1,47 	"/>
+	<polygon fill="#FFFFFF" points="58.9,44.2 58.9,47 63.8,47 63.8,52.6 58.9,52.6 58.9,55.4 53.1,49.8 	"/>
+	<polygon fill="#FFFFFF" points="50,37.3 55.6,43 53.5,43 53.5,46.8 50.7,49.8 53.5,52.8 53.5,57 55.6,57 49.9,62.7 44.3,57 
+		46.4,57 46.4,52.9 49.4,49.8 46.4,46.7 46.4,43 44.3,43 	"/>
+</g>
 </svg>

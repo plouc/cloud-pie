@@ -8,12 +8,12 @@ var Path   = require('./Path');
 
 // Layout setup
 var layout = {
-    vpc:         { borderRadius: 4, spacing: 60, b: { t: 60, r: 20, b: 20, l: 20 } },
-    autoscaling: { size: 80, spacing: 10 },
-    subnet:      { borderRadius: 2, spacing: 20, b: { t: 30,  r: 10, b: 10, l: 10 } },
+    vpc:         { borderRadius: 4, spacing: 60, b: { t: 100, r: 20, b: 20, l: 20 } },
+    autoscaling: { size: 36, spacing: 10, offset: { x: 30, y: -55 } },
+    subnet:      { borderRadius: 2, spacing: 50, b: { t: 30,  r: 10, b: 10, l: 10 } },
     instance:    { borderRadius: 0, size: 100, stateSize: 8, spacing: 7, padding: 8, indicatorWidth: 4 },
     volume:      { size: 32, spacing: 6 },
-    lb:          { size: 32 }
+    lb:          { size: 36, offset: { x: -30, y: -55 } }
 };
 
 module.exports = {
@@ -82,37 +82,41 @@ module.exports = {
                 });
             });
 
-            vpc.autoscalings.forEach((autoscaling, i) => {
-                autoscaling.layout = {
-                    x: i * (layout.autoscaling.size + layout.autoscaling.spacing) - layout.autoscaling.spacing + 60,
-                    y: 60
-                };
-                autoscaling.layout.anchor = new Anchor({
-                    x: autoscaling.layout.x,
-                    y: autoscaling.layout.y + 30
-                }, {
-                    distribute: 'horizontal',
-                    spacing:    10
+            vpc.autoscalings.forEach((autoscaling) => {
+                var asInstances = [];
+                var instance;
+                var instancePoints = [];
+
+                autoscaling.instances.forEach(instanceInfo => {
+                    instance = _.find(instances, { id: instanceInfo.id });
+                    if (instance) {
+                        asInstances.push(instance);
+                        instancePoints.push(instance.box.center);
+                    }
                 });
 
+                autoscaling.box = new Box();
+                autoscaling.box.setDimensions(
+                    layout.autoscaling.size,
+                    layout.autoscaling.size
+                );
+
+                if (asInstances.length === 1) {
+                    autoscaling.box.setCenter(
+                        asInstances[0].box.center.clone()
+                            .offset(layout.autoscaling.offset.x, asInstances[0].box.height * -0.5 + layout.autoscaling.offset.y)
+                    );
+                } else {
+                    autoscaling.box.setCenter(
+                        Point
+                            .centerFromPoints(instancePoints)
+                            .offset(layout.autoscaling.offset.x, 0)
+                    );
+                }
+
                 autoscaling.paths = [];
-                autoscaling.instances.forEach(instanceInfo => {
-                    if (_.find(instances, { id: instanceInfo.id })) {
-                        autoscaling.layout.anchor.add();
-                    }
-                });
-                autoscaling.instances.forEach(instanceInfo => {
-                    var instance = _.find(instances, { id: instanceInfo.id });
-                    if (instance) {
-                        var start = autoscaling.layout.anchor.get();
-                        autoscaling.paths.push([
-                            start,
-                            { x: start.x, y: start.y + 15 },
-                            { x: instance.box.origin.x + instance.box.width / 2,    y: instance.box.origin.y - 20   },
-                            { x: instance.box.origin.x + instance.box.width / 2,    y: instance.box.origin.y    }
-                        ]);
-                        autoscaling.layout.anchor.next();
-                    }
+                asInstances.forEach(instance => {
+                    autoscaling.paths.push(Path.fromBoxes(autoscaling.box, instance.box, 15, 15).points);
                 });
             });
 
@@ -148,7 +152,20 @@ module.exports = {
 
                 lb.box = new Box();
                 lb.box.setDimensions(layout.lb.size, layout.lb.size);
-                lb.box.setOrigin(Point.centerFromPoints(instancePoints).offset(layout.lb.size * -0.5, -layout.lb.size * -0.5));
+
+
+                if (lbInstances.length === 1) {
+                    lb.box.setCenter(
+                        lbInstances[0].box.center.clone()
+                            .offset(layout.lb.offset.x, lbInstances[0].box.height * -0.5 + layout.lb.offset.y)
+                    );
+                } else {
+                    lb.box.setCenter(
+                        Point
+                            .centerFromPoints(instancePoints)
+                            .offset(layout.lb.offset.x, 0)
+                    );
+                }
 
                 lb.paths = [];
                 lbInstances.forEach(instance => {
@@ -344,44 +361,35 @@ module.exports = {
             .attr('class', d => `subnet${ d.active ? ' _is-active' : '' }`)
         ;
 
-        /*
         var autoscalings = vpcsNodes.selectAll('.autoscaling')
             .data(d => d.autoscalings, d => d.name)
         ;
         autoscalings.enter().append('g')
             .attr('class', 'autoscaling')
-            .each(function (d) {
-                d.showLinks = false;
+            .each(function (autoscaling) {
+                autoscaling.showLinks = false;
                 var _this = d3.select(this);
 
                 var line = d3.svg.line()
                     .x(d => d.x)
                     .y(d => d.y)
-                    .interpolate('step')
+                    .interpolate('basis')
                 ;
 
-                d.paths.forEach(path => {
+                autoscaling.paths.forEach(path => {
                     _this.append('path').attr('class', 'as__instance__link').datum(path).attr('d', line);
                 });
-                _this.selectAll('.as__instance__link').style('display', 'none');
 
-                var autoscaling = d3.select(this).append('g')
-                    .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
+
+                var icon = _this.append('g')
+                    .attr('transform', `translate(${ autoscaling.box.center.x }, ${ autoscaling.box.center.y })`)
+                    .on('click', autoscaling => {
+                        clickHandler('autoscaling', autoscaling);
+                    })
                 ;
-                icons.autoscaling(autoscaling);
-
-                autoscaling.on('click', function (d) {
-                    d.showLinks = !d.showLinks;
-                    _this.selectAll('.as__instance__link').style('display', d.showLinks ? 'block' : 'none');
-
-                    clickHandler('autoscaling', d);
-                });
-                autoscaling.on('mouseenter', function (d) {
-                    //console.log(d.name || d.id);
-                });
+                icons.autoscaling(icon);
             })
         ;
-        */
 
 
         var instances = subnets.selectAll('.instance').data(d => d.instances);
