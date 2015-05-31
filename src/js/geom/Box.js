@@ -1,11 +1,21 @@
-var Point = require('./Point');
+var Point  = require('./Point');
+var Anchor = require('./Anchor');
+
 
 class Box {
     constructor() {
         this.center = new Point(0, 0);
         this.origin = new Point(0, 0);
+
         this.width  = 0;
         this.height = 0;
+
+        this.anchors = {
+            top:    new Anchor(),
+            right:  new Anchor(),
+            bottom: new Anchor(),
+            left:   new Anchor()
+        };
     }
 
     setOrigin(origin) {

@@ -24,39 +24,12 @@ margin 0
 
 @require "vpc.styl"
 @require "subnet.styl"
+@require "autoscaling.styl"
 @require "igw.styl"
 @require "instance.styl"
 @require "volume.styl"
 @require "item-info.styl"
 @require "info-panel.styl"
-
-
-.autoscaling
-  &__icon
-    cursor pointer
-
-    &__circle
-      fill $autoscaling-icon-background
-      stroke $autoscaling-icon-border-color
-      stroke-width $autoscaling-icon-border-width
-
-    &__front
-      fill $autoscaling-icon-symbol-color
-
-  &:hover
-    .autoscaling__icon
-      &__circle
-        fill $autoscaling-icon-background-hover
-
-      &__front
-        fill $autoscaling-icon-symbol-color-hover
-
-
-.as__instance__link
-  stroke $autoscaling-link-color
-  stroke-width 2px
-  fill none
-
 
 .lb
   &__link
@@ -80,19 +53,27 @@ margin 0
     .lb
       &__link
         stroke $lb-link-color-hover
+
       &__icon
         &__background
           fill $lb-icon-background-hover
           stroke $lb-icon-border-color-hover
 
+        &__symbol
+          fill $lb-icon-symbol-color-hover
+
   &._is-active
     .lb
       &__link
         stroke $lb-link-color-active
+
       &__icon
         &__background
           fill $lb-icon-background-active
           stroke $lb-icon-border-color-active
+
+        &__symbol
+          fill $lb-icon-symbol-color-active
 
 .item-props
   margin 15px 0

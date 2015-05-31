@@ -1,24 +1,17 @@
-var d3     = require('d3/d3');
-var _      = require('lodash');
-var icons  = require('./icons');
-var Anchor = require('./Anchor');
-var Box    = require('./Box');
-var Point  = require('./Point');
-var Path   = require('./Path');
+var d3            = require('d3/d3');
+var _             = require('lodash');
+var layout        = require('./Layout');
+var Anchor        = require('./../geom/Anchor');
+var Box           = require('./../geom/Box');
+var Point         = require('./../geom/Point');
+var Path          = require('./../geom/Path');
+var VpcPeerings   = require('./items/VpcPeerings');
+var Vpcs          = require('./items/Vpcs');
 
-// Layout setup
-var layout = {
-    vpc:         { borderRadius: 4, spacing: 60, b: { t: 100, r: 20, b: 20, l: 20 } },
-    autoscaling: { size: 36, spacing: 10, offset: { x: 30, y: -55 } },
-    subnet:      { borderRadius: 2, spacing: 50, b: { t: 30,  r: 10, b: 10, l: 10 } },
-    instance:    { borderRadius: 0, size: 100, stateSize: 8, spacing: 7, padding: 8, indicatorWidth: 4 },
-    volume:      { size: 32, spacing: 6 },
-    lb:          { size: 36, offset: { x: -30, y: -55 } }
-};
 
 module.exports = {
     create(el) {
-        d3.select(el).append('svg')
+        var schema = d3.select(el).append('svg')
             // @todo compute required dimensions
             .attr('width',  3000)
             .attr('height', 3000)
@@ -26,6 +19,25 @@ module.exports = {
             .attr('class', 'schema__wrapper')
             .attr('transform', 'translate(30, 120)')
         ;
+
+        var defs = schema.append('defs');
+
+        /*
+        defs.append('marker')
+            .attr('id', 'myMarker')
+            .attr('orient', 'auto')
+            .attr('viewBox', '0 0 5 8')
+            .attr({ refX: 4, refY: 4 })
+            //.attr('markerUnits', 'strokeWidth')
+            .attr('markerWidth', 5)
+            .attr('markerHeight', 8)
+        .append('polyline')
+            .attr('points', '1,1 4,4 1,7')
+            .attr('class', 'arrow-marker')
+            .attr('fill', 'none')
+            .attr('stroke', 'context-stroke')
+        ;
+        */
     },
 
     update(el, vpcs, peerings, options) {
@@ -39,7 +51,7 @@ module.exports = {
             vpc.maxInstances  = 0;
             var maxInstSubnet = _.max(vpc.subnets, subnet => subnet.instances.length);
             if (_.isObject(maxInstSubnet)) {
-                vpc.maxInstances  = maxInstSubnet.instances.length;
+                vpc.maxInstances = maxInstSubnet.instances.length;
             }
 
             // pre-compute layout
@@ -56,24 +68,88 @@ module.exports = {
 
             var instances = [];
 
+            vpc.subnets.sort((a, b) => b.instances.length - a.instances.length);
+
+            var remainingSubnets = vpc.subnets.slice(0);
+            var subnetRows = [{
+                remaining: vpc.maxInstances,
+                subnets:   []
+            }];
+            var currentSubnetRow = subnetRows[0];
+
+            var done = false;
+            while (done !== true) {
+                if (remainingSubnets.length === 0) {
+                    done = true;
+                } else {
+                    var minLength = _.min(_.map(vpc.subnets, subnet => subnet.instances.length));
+
+                    if (currentSubnetRow.remaining === 0) {
+                        currentSubnetRow = {
+                            remaining: vpc.maxInstances,
+                            subnets:   []
+                        };
+                        subnetRows.push(currentSubnetRow);
+                    }
+
+                    if (minLength > currentSubnetRow.remaining) {
+                        currentSubnetRow = {
+                            remaining: vpc.maxInstances,
+                            subnets:   []
+                        };
+                        subnetRows.push(currentSubnetRow);
+                    }
+
+                    for (var i = 0; i < remainingSubnets.length; i++) {
+                        var subnet = remainingSubnets[i];
+                        if (subnet.instances.length <= currentSubnetRow.remaining) {
+                            currentSubnetRow.subnets.push(remainingSubnets.splice(i, 1)[0]);
+                            currentSubnetRow.remaining -= subnet.instances.length;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            subnetRows.forEach((row, rowIndex) => {
+                row.subnets.forEach((subnet, i) => {
+                    subnet.box = new Box();
+
+                    var x = layout.vpc.b.l;
+                    if (i > 0) {
+                        x += row.subnets[i - 1].box.origin.x + row.subnets[i - 1].box.width
+                    }
+
+                    subnet.box.setOrigin(new Point(
+                        x,
+                        rowIndex * (layout.instance.size + layout.subnet.b.t + layout.subnet.b.b) +
+                        rowIndex * layout.subnet.spacing + layout.vpc.b.t
+                    ));
+
+                    subnet.box.setDimensions(
+                        subnet.instances.length * layout.instance.size +
+                        (subnet.instances.length - 1) * layout.instance.spacing +
+                        layout.subnet.b.l + layout.subnet.b.r,
+                        layout.instance.size + layout.subnet.b.t + layout.subnet.b.b
+                    );
+                });
+            });
+
             vpc.subnets.forEach((subnet, i) => {
                 subnet.layout = {
-                    x: layout.vpc.b.l,
-                    y: i * (layout.instance.size + layout.subnet.b.t + layout.subnet.b.b) + i * layout.subnet.spacing + layout.vpc.b.t,
-                    width:  vpc.maxInstances * layout.instance.size +
-                           (vpc.maxInstances - 1) * layout.instance.spacing +
+                    width:  subnet.instances.length * layout.instance.size +
+                           (subnet.instances.length - 1) * layout.instance.spacing +
                             layout.subnet.b.l + layout.subnet.b.r,
-                    height: layout.instance.size + layout.subnet.b.t + layout.subnet.b.b
                 };
 
                 subnet.instances.forEach((instance, i) => {
                     instance.box = new Box();
                     instance.box
                         .setOrigin(new Point(
-                            subnet.layout.x +
+                            subnet.box.origin.x +
                             i * layout.instance.size +
                             i * layout.instance.spacing + layout.subnet.b.l,
-                            subnet.layout.y + layout.subnet.b.t
+                            subnet.box.origin.y + layout.subnet.b.t
                         ))
                         .setDimensions(layout.instance.size, layout.instance.size)
                     ;
@@ -116,7 +192,7 @@ module.exports = {
 
                 autoscaling.paths = [];
                 asInstances.forEach(instance => {
-                    autoscaling.paths.push(Path.fromBoxes(autoscaling.box, instance.box, 15, 15).points);
+                    autoscaling.paths.push(Path.fromBoxes(autoscaling.box, instance.box, 10, 10).points);
                 });
             });
 
@@ -169,7 +245,7 @@ module.exports = {
 
                 lb.paths = [];
                 lbInstances.forEach(instance => {
-                    lb.paths.push(Path.fromBoxes(lb.box, instance.box, 15, 15).points);
+                    lb.paths.push(Path.fromBoxes(lb.box, instance.box, 10, 10).points);
                 });
             });
         });
@@ -188,69 +264,7 @@ module.exports = {
         });
 
 
-        var vpcsNodes = schema.selectAll('.vpc').data(vpcs, d => d.id);
-        vpcsNodes.enter().append('g')
-            .each(function (d) {
-                var vpc = d3.select(this);
-
-                vpc.append('rect')
-                    .attr('class', 'vpc__wrapper')
-                    .attr('width', d.layout.width)
-                    .attr('height', d.layout.height)
-                    .attr({ rx: layout.vpc.borderRadius, ry: layout.vpc.borderRadius })
-                ;
-
-                var vpcIcon = vpc.append('g').attr('transform', 'translate(36, 30)');
-                icons.vpc(vpcIcon);
-                vpcIcon.append('text')
-                    .attr('class', 'vpc__label__text')
-                    .attr('text-anchor', 'start')
-                    .attr('x', 24)
-                    .attr('y', 5)
-                    .text(d.tags.name ? d.tags.name : d.id)
-                ;
-
-                vpcIcon.on('click', function (d) {
-                    clickHandler('vpc', d);
-                });
-
-                if (d.internetGateway !== null) {
-                    var igwGroup = vpc.append('g')
-                        .attr('class', 'igw')
-                        .attr('transform', `translate(${ d.layout.width - 30 - layout.vpc.b.r }, 0)`)
-                    ;
-                    icons.igw(igwGroup);
-                    igwGroup.append('text')
-                        .attr('class', 'igw__label__text')
-                        .text(d.internetGateway.tags.name ? d.internetGateway.tags.name : d.internetGateway.id)
-                        .attr('text-anchor', 'middle')
-                        .attr('y', -40)
-                    ;
-
-                    igwGroup.on('click', d => {
-                        clickHandler('igw', d.internetGateway);
-                    });
-                }
-            })
-        ;
-
-        vpcsNodes
-            .attr('class', d => `vpc${ d.active ? ' _is-active' : '' }`)
-            .attr('transform', d => `translate(${ d.layout.x }, 0)`)
-            .each(function (d) {
-                var _this = d3.select(this);
-
-                if (d.internetGateway !== null) {
-                    var igw = d.internetGateway;
-                    _this.selectAll('.igw')
-                        .attr('class', d => `igw${ igw.active ? ' _is-active' : '' }`)
-                    ;
-                }
-            })
-        ;
-
         var peeringsData = [];
-
         var peeringOffsetV = 80;
         peerings.forEach(peering => {
             var requester = _.find(vpcs, { id: peering.requesterVpcInfo.id });
@@ -280,222 +294,7 @@ module.exports = {
             }
         });
 
-
-        var peeringNodes = schema.selectAll('.vpc__peering')
-            .data(peeringsData, d => d.peering.id)
-        ;
-        peeringNodes.enter().append('g')
-            .attr('class', 'vpc__peering')
-            .each(function (d) {
-                var _this = d3.select(this);
-
-                var line = d3.svg.line()
-                    .x(d => d.x)
-                    .y(d => d.y)
-                    .interpolate('linear')
-                ;
-
-                _this.append('path').datum(d.points)
-                    .attr('class', 'vpc__peering__path')
-                    .attr('d', line)
-                ;
-
-                var reqIcon = _this.append('g')
-                    .attr('class', 'vpc__peering__icon')
-                    .attr('transform', `translate(${ d.points[0].x }, ${ d.points[0].y })`)
-                ;
-                var accIcon = _this.append('g')
-                    .attr('class', 'vpc__peering__icon')
-                    .attr('transform', `translate(${ d.points[4].x }, ${ d.points[4].y })`)
-                ;
-
-                icons.vpcPeering(reqIcon);
-                icons.vpcPeering(accIcon);
-
-                reqIcon.on('click', d => { clickHandler('peering', d.peering); });
-                accIcon.on('click', d => { clickHandler('peering', d.peering); });
-            })
-        ;
-
-        peeringNodes
-            .attr('class', d => `vpc__peering${ d.peering.active ? ' _is-active' : '' }`)
-        ;
-
-        var subnets = vpcsNodes.selectAll('.subnet').data(d => d.subnets, d => d.id);
-        subnets.enter().append('g')
-            .attr('class', 'subnet')
-            .each(function (d) {
-                var subnet = d3.select(this);
-
-                subnet.append('rect')
-                    .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
-                    .attr('class', 'subnet__wrapper')
-                    .attr('width',  d.layout.width)
-                    .attr('height', d.layout.height)
-                    .attr({ rx: layout.subnet.borderRadius, ry: layout.subnet.borderRadius })
-                    .on('click', function (d) {
-                        clickHandler('subnet', d);
-                    })
-                ;
-
-                subnet.append('text')
-                    .attr('transform', d => `translate(${ d.layout.x }, ${ d.layout.y })`)
-                    .attr('class', 'subnet__label__text')
-                    .attr('x', layout.subnet.b.l)
-                    .attr('y', 18)
-                    .text(d.tags.name ? d.tags.name : d.id)
-                ;
-
-                subnet.append('text')
-                    .attr('transform', d => `translate(${ d.layout.x + d.layout.width }, ${ d.layout.y })`)
-                    .attr('class', 'subnet__zone')
-                    .attr('text-anchor', 'end')
-                    .attr('x', -layout.subnet.b.r)
-                    .attr('y', 18)
-                    .text(d.zone)
-                ;
-            })
-        ;
-
-        subnets
-            .attr('class', d => `subnet${ d.active ? ' _is-active' : '' }`)
-        ;
-
-        var autoscalings = vpcsNodes.selectAll('.autoscaling')
-            .data(d => d.autoscalings, d => d.name)
-        ;
-        autoscalings.enter().append('g')
-            .attr('class', 'autoscaling')
-            .each(function (autoscaling) {
-                autoscaling.showLinks = false;
-                var _this = d3.select(this);
-
-                var line = d3.svg.line()
-                    .x(d => d.x)
-                    .y(d => d.y)
-                    .interpolate('basis')
-                ;
-
-                autoscaling.paths.forEach(path => {
-                    _this.append('path').attr('class', 'as__instance__link').datum(path).attr('d', line);
-                });
-
-
-                var icon = _this.append('g')
-                    .attr('transform', `translate(${ autoscaling.box.center.x }, ${ autoscaling.box.center.y })`)
-                    .on('click', autoscaling => {
-                        clickHandler('autoscaling', autoscaling);
-                    })
-                ;
-                icons.autoscaling(icon);
-            })
-        ;
-
-
-        var instances = subnets.selectAll('.instance').data(d => d.instances);
-        instances.enter().append('g')
-            .attr('transform', instance => `translate(${ instance.box.origin.x }, ${ instance.box.origin.y })`)
-            .attr('class', 'instance')
-            .each(function (instance) {
-                var instanceEl = d3.select(this);
-                var icon = instanceEl.append('rect')
-                    .attr('class', 'instance__wrapper')
-                    .attr('width',  instance.box.width)
-                    .attr('height', instance.box.height)
-                    .attr({ rx: layout.instance.borderRadius, ry: layout.instance.borderRadius })
-                ;
-
-                icon.on('click', function (instance) {
-                    clickHandler('instance', instance);
-                });
-
-                instanceEl.append('circle')
-                    .attr('class', `instance__state instance__state--${ instance.state }`)
-                    .attr('r', layout.instance.stateSize / 2)
-                    .attr('cx', 12)
-                    .attr('cy', 15)
-                ;
-
-                instanceEl.append('text')
-                    .attr('class', 'instance__name')
-                    .attr('x', 24)
-                    .attr('y', 20)
-                    .text(instance.tags.name ? instance.tags.name : instance.id)
-                ;
-
-                instanceEl.append('rect')
-                    .attr('class', 'instance__indicator')
-                    .attr('width',  layout.instance.indicatorWidth)
-                    .attr('height', instance.box.height)
-                ;
-            })
-        ;
-
-        instances
-            .attr('class', instance => `instance${ instance.active ? ' _is-active' : '' }`)
-        ;
-
-        var volumes = instances.selectAll('.volume').data(d => d.blockDeviceMappings);
-        volumes.enter().append('g')
-            .attr('class', 'volume')
-            .attr('transform', (d, i) => {
-                return `translate(${ i * layout.volume.size + i * layout.volume.spacing + layout.instance.padding }, ${ layout.instance.size - layout.volume.size - layout.instance.padding })`;
-            })
-            .each(function (d) {
-                var volume = d3.select(this);
-                volume.append('rect')
-                    .attr('class', 'volume__wrapper')
-                    .attr('width',  layout.volume.size)
-                    .attr('height', layout.volume.size)
-                    .attr({ rx: 2, ry: 2 })
-                ;
-
-                volume.append('text')
-                    .attr('class', 'volume__label__text')
-                    .attr('text-anchor', 'middle')
-                    .attr('x', layout.volume.size / 2)
-                    .attr('y', 17)
-                    .text(d.ebs.ebs.size)
-                ;
-
-                volume.on('click', d => {
-                    clickHandler('volume', d);
-                });
-            })
-        ;
-
-        var loadBalancers = vpcsNodes.selectAll('.lb')
-            .data(d => d.loadBalancers, d => d.name)
-        ;
-        loadBalancers.enter().append('g')
-            .attr('class', 'lb')
-            .each(function (lb) {
-                var lbEl = d3.select(this);
-
-                var line = d3.svg.line()
-                    .x(d => d.x)
-                    .y(d => d.y)
-                    .interpolate('basis')
-                ;
-
-                lb.paths.forEach(path => {
-                    lbEl.append('path').attr('class', 'lb__link').datum(path).attr('d', line);
-                });
-
-                //lb.append('text').text(d => d.name);
-
-                var icon = lbEl.append('g')
-                    .attr('transform', `translate(${ lb.box.center.x }, ${ lb.box.center.y })`)
-                    .on('click', lb => {
-                        clickHandler('lb', lb);
-                    })
-                ;
-                icons.loadBalancer(icon);
-            })
-        ;
-
-        loadBalancers
-            .attr('class', lb => `lb${ lb.active ? ' _is-active' : '' }`)
-        ;
+        schema.call(Vpcs(vpcs, clickHandler));
+        schema.call(VpcPeerings(peeringsData, clickHandler));
     }
 };

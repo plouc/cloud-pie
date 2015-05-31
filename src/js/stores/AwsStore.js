@@ -13,6 +13,9 @@ function resetActive() {
                 instance.active = false;
             });
         });
+        vpc.autoscalings.forEach(autoscaling => {
+            autoscaling.active = false;
+        });
         if (vpc.internetGateway) {
             vpc.internetGateway.active = false;
         }
@@ -70,10 +73,13 @@ module.exports = AwsStore = Reflux.createStore({
                 });
                 break;
 
-            case 'loadBalancer':
-                break;
-
             case 'autoscaling':
+                console.log(data);
+                _stack.vpcs.forEach(vpc => {
+                    vpc.autoscalings.forEach(autoscaling => {
+                        autoscaling.active = autoscaling.name === data.name;
+                    });
+                });
                 break;
 
             case 'subnet':

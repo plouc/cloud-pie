@@ -1,0 +1,44 @@
+.autoscaling
+  &__link
+    stroke $autoscaling-link-color
+    stroke-width $autoscaling-link-width
+    fill none
+
+  &__icon
+    cursor pointer
+
+    &__circle
+      fill         $autoscaling-icon-background
+      stroke       $autoscaling-icon-border-color
+      stroke-width $autoscaling-icon-border-width
+
+    &__front
+      fill $autoscaling-icon-symbol-color
+
+  &:hover
+    .autoscaling
+      &__link
+        stroke       $autoscaling-link-color-hover
+        stroke-width $autoscaling-link-width-hover
+
+      &__icon
+        &__circle
+          fill   $autoscaling-icon-background-hover
+          stroke $autoscaling-icon-border-color-hover
+
+        &__front
+          fill $autoscaling-icon-symbol-color-hover
+
+  &._is-active
+    .autoscaling
+      &__link
+        stroke       $autoscaling-link-color-active
+        stroke-width $autoscaling-link-width-active
+
+      &__icon
+        &__circle
+          fill   $autoscaling-icon-background-active
+          stroke $autoscaling-icon-border-color-active
+
+        &__front
+          fill $autoscaling-icon-symbol-color-active

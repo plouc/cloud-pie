@@ -46,6 +46,7 @@ module.exports.fetch = function () {
         if (err) {
             autoscalingsDef.reject(err);
         } else {
+            console.log(chalk.yellow('- fetched autoscaling groups'));
             autoscalingsDef.resolve(data.AutoScalingGroups.map(function (autoscaling) {
                 return {
                     name:                autoscaling.AutoScalingGroupName,
@@ -77,6 +78,7 @@ module.exports.fetch = function () {
         if (err) {
             subnetsDef.reject(err);
         } else {
+            console.log(chalk.yellow('- fetched subnets'));
             subnetsDef.resolve(data.Subnets.map(function (subnet) {
                 return {
                     id:                  subnet.SubnetId,
@@ -100,6 +102,7 @@ module.exports.fetch = function () {
         if (err) {
             igwsDef.reject(err);
         } else {
+            console.log(chalk.yellow('- fetched internet gateways'));
             igwsDef.resolve(data.InternetGateways.map(function (igw) {
                 return {
                     id:          igw.InternetGatewayId,
@@ -121,6 +124,7 @@ module.exports.fetch = function () {
         if (err) {
             volumesDef.reject(err);
         } else {
+            console.log(chalk.yellow('- fetched volumes'));
             // Attachments: [Object],
             volumesDef.resolve(data.Volumes.map(function (volume) {
                 return {
@@ -144,6 +148,7 @@ module.exports.fetch = function () {
         if (err) {
             vpcsDef.reject(err);
         } else {
+            console.log(chalk.yellow('- fetched VPCs'));
             vpcsDef.resolve(data.Vpcs.map(function (vpc) {
                 return {
                     id:              vpc.VpcId,
@@ -168,6 +173,7 @@ module.exports.fetch = function () {
         if (err) {
             vpcPeeringsDef.reject(err);
         } else {
+            console.log(chalk.yellow('- fetched vpc peerings'));
             vpcPeeringsDef.resolve(data.VpcPeeringConnections.map(function (pc) {
                 return {
                     id:               pc.VpcPeeringConnectionId,
@@ -195,6 +201,7 @@ module.exports.fetch = function () {
         if (err) {
             instancesDef.reject(err);
         } else {
+            console.log(chalk.yellow('- fetched instances'));
             var instances = [];
             data.Reservations.forEach(function (reservation) {
                 reservation.Instances.forEach(function (instance) {
@@ -238,6 +245,7 @@ module.exports.fetch = function () {
         if (err) {
             securityGroupsDef.reject(err);
         } else {
+            console.log(chalk.yellow('- fetched security groups'));
             var securityGroups = [];
 
             data.SecurityGroups.forEach(function (securityGroup) {
@@ -253,7 +261,8 @@ module.exports.fetch = function () {
         if (err) {
             loadBalancersDef.reject(err);
         } else {
-            var loadBalancers = data.LoadBalancerDescriptions.map(function (lb) {
+            console.log(chalk.yellow('- fetched load balancers'));
+            loadBalancersDef.resolve(data.LoadBalancerDescriptions.map(function (lb) {
                 return {
                     name:                      lb.LoadBalancerName,
                     dnsName:                   lb.DNSName,
@@ -264,9 +273,7 @@ module.exports.fetch = function () {
                     instancesIds:              _.pluck(lb.Instances, 'InstanceId'),
                     scheme:                    lb.Scheme
                 };
-            });
-
-            loadBalancersDef.resolve(loadBalancers);
+            }));
         }
     });
 
@@ -288,6 +295,7 @@ module.exports.fetch = function () {
                 if (err) {
                     def.reject(err);
                 } else {
+                    console.log(chalk.yellow('- fetched AMIs'));
                     props.loadBalancers.forEach(function (lb) {
                         var lbVpc = _.find(props.vpcs, { id: lb.vpcId });
                         if (lbVpc) {

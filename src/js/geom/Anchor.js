@@ -1,5 +1,6 @@
 class Anchor {
     constructor(origin, options = {}) {
+        options = options || {};
         this.origin     = origin;
         this.spacing    = options.spacing || 50;
         this.count      = 0;
@@ -8,6 +9,10 @@ class Anchor {
         this.distribute = options.distribute || 'horizontal';
 
         this.points = [this.origin];
+    }
+
+    setOrigin() {
+        this.origin = origin;
     }
 
     add() {
