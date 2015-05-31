@@ -5,45 +5,45 @@ var layout    = require('./../Layout');
 module.exports = function (clickHandler) {
     return function () {
         var subnets = this.selectAll('.subnet')
-            .data(d => d.subnets, d => d.id)
+            .data(vpc => vpc.subnets, subnet => subnet.id)
         ;
 
         // Enter
         subnets.enter().append('g')
             .attr('class', 'subnet')
-            .each(function (d) {
-                var subnet = d3.select(this);
+            .each(function (subnet) {
+                var subnetEl = d3.select(this);
 
-                subnet.append('rect')
-                    .attr('transform', d => `translate(${ d.box.origin.x }, ${ d.box.origin.y })`)
+                subnetEl.append('rect')
+                    .attr('transform', `translate(${ subnet.box.origin.x }, ${ subnet.box.origin.y })`)
                     .attr('class', 'subnet__wrapper')
-                    .attr('width',  d.layout.width)
-                    .attr('height', d.box.height)
+                    .attr('width',  subnet.box.width)
+                    .attr('height', subnet.box.height)
                     .attr({ rx: layout.subnet.borderRadius, ry: layout.subnet.borderRadius })
                     .on('click', function (d) {
-                        clickHandler('subnet', d);
+                        clickHandler('subnet', subnet);
                     })
                 ;
 
-                subnet.append('text')
-                    .attr('transform', d => `translate(${ d.box.origin.x + 17 }, ${ d.box.origin.y + layout.subnet.b.t + layout.instance.size / 2 }) rotate(-90)`)
+                subnetEl.append('text')
+                    .attr('transform', `translate(${ subnet.box.origin.x + 17 }, ${ subnet.box.origin.y + layout.subnet.b.t + layout.instance.size / 2 }) rotate(-90)`)
                     .attr('class', 'subnet__label__text')
                     .attr('text-anchor', 'middle')
-                    .text(d.tags.name ? d.tags.name : d.id)
+                    .text(subnet.tags.name ? subnet.tags.name : subnet.id)
                 ;
 
-                subnet.append('text')
-                    .attr('transform', d => `translate(${ d.box.origin.x + d.layout.width - 13 }, ${ d.box.origin.y + layout.subnet.b.t + layout.instance.size / 2 }) rotate(-90)`)
+                subnetEl.append('text')
+                    .attr('transform', `translate(${ subnet.box.origin.x + subnet.box.width - 13 }, ${ subnet.box.origin.y + layout.subnet.b.t + layout.instance.size / 2 }) rotate(-90)`)
                     .attr('class', 'subnet__zone')
                     .attr('text-anchor', 'middle')
-                    .text(d.zone)
+                    .text(subnet.zone)
                 ;
             })
         ;
 
         // Update
         subnets
-            .attr('class', d => `subnet${ d.active ? ' _is-active' : '' }`)
+            .attr('class', subnet => `subnet${ subnet.active ? ' _is-active' : '' }`)
         ;
 
         subnets.call(Instances(clickHandler));

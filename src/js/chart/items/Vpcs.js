@@ -19,8 +19,8 @@ module.exports = function (data, clickHandler) {
 
                 vpc.append('rect')
                     .attr('class', 'vpc__wrapper')
-                    .attr('width', d.layout.width)
-                    .attr('height', d.layout.height)
+                    .attr('width', d.box.width)
+                    .attr('height', d.box.height)
                     .attr({ rx: layout.vpc.borderRadius, ry: layout.vpc.borderRadius })
                 ;
 
@@ -41,7 +41,7 @@ module.exports = function (data, clickHandler) {
                 if (d.internetGateway !== null) {
                     var igwGroup = vpc.append('g')
                             .attr('class', 'igw')
-                            .attr('transform', `translate(${ d.layout.width - 30 - layout.vpc.b.r }, 0)`)
+                            .attr('transform', `translate(${ d.box.width - 30 - layout.vpc.b.r }, 0)`)
                         ;
                     icons.igw(igwGroup);
                     igwGroup.append('text')
@@ -61,7 +61,7 @@ module.exports = function (data, clickHandler) {
         // Update
         vpcsNodes
             .attr('class', d => `vpc${ d.active ? ' _is-active' : '' }`)
-            .attr('transform', d => `translate(${ d.layout.x }, 0)`)
+            .attr('transform', d => `translate(${ d.box.origin.x }, 0)`)
             .each(function (d) {
                 var _this = d3.select(this);
 

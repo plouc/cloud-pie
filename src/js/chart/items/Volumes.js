@@ -18,7 +18,7 @@ module.exports = function (clickHandler) {
                     .attr('class', 'volume__wrapper')
                     .attr('width',  layout.volume.size)
                     .attr('height', layout.volume.size)
-                    .attr({ rx: 2, ry: 2 })
+                    .attr({ rx: layout.volume.borderRadius, ry: layout.volume.borderRadius })
                 ;
 
                 volume.append('text')

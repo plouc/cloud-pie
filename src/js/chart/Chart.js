@@ -54,17 +54,18 @@ module.exports = {
                 vpc.maxInstances = maxInstSubnet.instances.length;
             }
 
-            // pre-compute layout
-            vpc.layout = {};
-            vpc.layout.width = vpc.maxInstances * layout.instance.size +
-                              (vpc.maxInstances - 1) * layout.instance.spacing +
-                              layout.vpc.b.l + layout.vpc.b.r +
-                              layout.subnet.b.l + layout.subnet.b.r;
-            vpc.layout.height = vpc.subnets.length * layout.instance.size +
-                                vpc.subnets.length * (layout.subnet.b.t + layout.subnet.b.b + layout.subnet.spacing) - layout.subnet.spacing +
-                                layout.vpc.b.t + layout.vpc.b.b;
-            vpc.layout.x = vpcX;
-            vpcX += vpc.layout.width + layout.vpc.spacing;
+            vpc.box = new Box();
+            vpc.box.setDimensions(
+                vpc.maxInstances * layout.instance.size +
+                (vpc.maxInstances - 1) * layout.instance.spacing +
+                layout.vpc.b.l + layout.vpc.b.r +
+                layout.subnet.b.l + layout.subnet.b.r,
+                vpc.subnets.length * layout.instance.size +
+                vpc.subnets.length * (layout.subnet.b.t + layout.subnet.b.b + layout.subnet.spacing) - layout.subnet.spacing +
+                layout.vpc.b.t + layout.vpc.b.b
+            );
+            vpc.box.setOrigin(new Point(vpcX, 0));
+            vpcX += vpc.box.width + layout.vpc.spacing;
 
             var instances = [];
 
@@ -132,31 +133,30 @@ module.exports = {
                         layout.subnet.b.l + layout.subnet.b.r,
                         layout.instance.size + layout.subnet.b.t + layout.subnet.b.b
                     );
+
+                    subnet.instances.forEach((instance, i) => {
+                        instance.box = new Box();
+                        instance.box
+                            .setOrigin(new Point(
+                                subnet.box.origin.x +
+                                i * layout.instance.size +
+                                i * layout.instance.spacing + layout.subnet.b.l,
+                                subnet.box.origin.y + layout.subnet.b.t
+                            ))
+                            .setDimensions(layout.instance.size, layout.instance.size)
+                        ;
+
+                        instances.push(instance);
+                    });
                 });
             });
 
-            vpc.subnets.forEach((subnet, i) => {
-                subnet.layout = {
-                    width:  subnet.instances.length * layout.instance.size +
-                           (subnet.instances.length - 1) * layout.instance.spacing +
-                            layout.subnet.b.l + layout.subnet.b.r,
-                };
-
-                subnet.instances.forEach((instance, i) => {
-                    instance.box = new Box();
-                    instance.box
-                        .setOrigin(new Point(
-                            subnet.box.origin.x +
-                            i * layout.instance.size +
-                            i * layout.instance.spacing + layout.subnet.b.l,
-                            subnet.box.origin.y + layout.subnet.b.t
-                        ))
-                        .setDimensions(layout.instance.size, layout.instance.size)
-                    ;
-
-                    instances.push(instance);
-                });
-            });
+            vpc.box.setDimensions(
+                vpc.box.width,
+                subnetRows.length * layout.instance.size +
+                subnetRows.length * (layout.subnet.b.t + layout.subnet.b.b + layout.subnet.spacing) - layout.subnet.spacing +
+                layout.vpc.b.t + layout.vpc.b.b
+            );
 
             vpc.autoscalings.forEach((autoscaling) => {
                 var asInstances = [];
@@ -201,14 +201,14 @@ module.exports = {
                 accepts:  []
             };
 
-            vpc.layout.peerAnchorReq = new Anchor({
-                x: vpc.layout.x + vpc.layout.width / 2,
+            vpc.peerAnchorReq = new Anchor({
+                x: vpc.box.origin.x + vpc.box.width / 2,
                 y: 0
             }, {
                 distribute: 'horizontal'
             });
-            vpc.layout.peerAnchorAcc = new Anchor({
-                x: vpc.layout.x,
+            vpc.peerAnchorAcc = new Anchor({
+                x: vpc.box.origin.x,
                 y: 100
             }, {
                 distribute: 'vertical'
@@ -256,10 +256,10 @@ module.exports = {
 
             if (requester && accepter) {
                 requester.peerings.requests.push(peering);
-                requester.layout.peerAnchorReq.add();
+                requester.peerAnchorReq.add();
 
                 accepter.peerings.accepts.push(peering);
-                accepter.layout.peerAnchorAcc.add();
+                accepter.peerAnchorAcc.add();
             }
         });
 
@@ -271,8 +271,8 @@ module.exports = {
             var accepter  = _.find(vpcs, { id: peering.accepterVpcInfo.id  });
 
             if (requester && accepter) {
-                var start = requester.layout.peerAnchorReq.get();
-                var end   = accepter.layout.peerAnchorAcc.get();
+                var start = requester.peerAnchorReq.get();
+                var end   = accepter.peerAnchorAcc.get();
 
                 var points = [
                     start,
@@ -282,8 +282,8 @@ module.exports = {
                     end
                 ];
 
-                requester.layout.peerAnchorReq.next();
-                accepter.layout.peerAnchorAcc.next();
+                requester.peerAnchorReq.next();
+                accepter.peerAnchorAcc.next();
 
                 peeringOffsetV += 15;
 
