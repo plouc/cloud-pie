@@ -1,26 +1,17 @@
-@require "vars.styl"
+@require "vars-alt.styl"
 
-* {
+*
   box-sizing: border-box;
-}
-html, body {
+
+html, body
   font-family consolas, menlo, monaco, monospace
-  //background $main-background
-  background: #32a5b3; /* Old browsers */
-  background: -moz-linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left bottom, right top, color-stop(0%, #32a5b3), color-stop(100%, #73c9ae)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* IE10+ */
-  background: linear-gradient(65deg, #32a5b3 0%, #73c9ae 100%); /* W3C */
-}
+  background $main-background
 
 margin 0
   height 100%
 
-.schema {
-  margin: 20px;
-}
+.schema
+  margin 20px
 
 @require "vpc.styl"
 @require "subnet.styl"
@@ -28,7 +19,6 @@ margin 0
 @require "igw.styl"
 @require "instance.styl"
 @require "volume.styl"
-@require "item-info.styl"
 @require "info-panel.styl"
 
 .lb
@@ -74,21 +64,3 @@ margin 0
 
         &__symbol
           fill $lb-icon-symbol-color-active
-
-.item-props
-  margin 15px 0
-  padding 0
-  list-style none
-
-  &__prop
-    padding 0 15px
-    margin-bottom 5px
-
-  &__key
-    display inline-block
-    font-weight 800
-    color #b8c39e
-    margin-right 10px
-
-  &__value
-    color #41817a

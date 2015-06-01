@@ -5,8 +5,6 @@ module.exports = InstanceItem = React.createClass({
     render() {
         var data = this.props.data;
 
-        //console.log(data);
-
         return (
             <div>
                 <h3 className="item-info__id">{ data.tags.name || data.id }</h3>
@@ -14,6 +12,7 @@ module.exports = InstanceItem = React.createClass({
                 <Properties properties={{
                     id:           data.id,
                     type:         data.type,
+                    state:        data.state,
                     'private ip': data.privateIpAddress || '—',
                     'public ip':  data.publicIpAddress || '—'
                 }}/>

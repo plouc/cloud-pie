@@ -4,14 +4,10 @@
     stroke $vpc-border-color
     stroke-width $vpc-border-width
 
-  &__label__background
-    fill rgb(169, 223, 196)
-    stroke rgb(76, 147, 120)
-
   &__label__text
     font-weight 700
     font-size 14px
-    fill #63b597
+    fill $vpc-text-color
 
   &__icon
     cursor pointer
@@ -34,7 +30,7 @@
   &._is-active
     .vpc
       &__label__text
-        fill #63b597
+        fill $vpc-text-color-active
 
       &__wrapper
         fill $vpc-background-active
@@ -59,7 +55,7 @@
 
   &__peering
     &__path
-      stroke #a9dfc4
+      stroke $vpc-peering-link-color
       stroke-width 2px
       fill none
 
@@ -84,7 +80,7 @@
     &._is-active
       .vpc__peering
         &__path
-          stroke #b9f2d6
+          stroke $vpc-peering-link-color-active
 
         &__icon
           &__line

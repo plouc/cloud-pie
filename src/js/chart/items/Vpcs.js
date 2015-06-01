@@ -22,6 +22,9 @@ module.exports = function (data, clickHandler) {
                     .attr('width', d.box.width)
                     .attr('height', d.box.height)
                     .attr({ rx: layout.vpc.borderRadius, ry: layout.vpc.borderRadius })
+                    .on('click', function (d) {
+                        clickHandler('vpc', d);
+                    })
                 ;
 
                 var vpcIcon = vpc.append('g').attr('transform', 'translate(36, 30)');
@@ -40,9 +43,9 @@ module.exports = function (data, clickHandler) {
 
                 if (d.internetGateway !== null) {
                     var igwGroup = vpc.append('g')
-                            .attr('class', 'igw')
-                            .attr('transform', `translate(${ d.box.width - 30 - layout.vpc.b.r }, 0)`)
-                        ;
+                        .attr('class', 'igw')
+                        .attr('transform', `translate(${ d.box.width - 30 - layout.vpc.b.r }, 0)`)
+                    ;
                     icons.igw(igwGroup);
                     igwGroup.append('text')
                         .attr('class', 'igw__label__text')

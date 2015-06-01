@@ -8,9 +8,8 @@
   bottom 0
   background $info-panel-background
   z-index 100
-  color #41817a
+  color $info-panel-text-color
   font-size 14px
-  box-shadow 0 0 3px rgba(0, 0, 0, 0.5);
 
   transform translate3d(100%, 0, 0)
 
@@ -23,7 +22,8 @@
     display block
     font-size 12px
     padding 3px 7px
-    background #d2dac4
+    background $info-panel-close-background
+    color      $info-panel-close-text-color
     border-radius 2px
     cursor pointer
     &:hover
@@ -31,4 +31,36 @@
 
   &._is-opened
     transform translate3d(-100%, 0, 0)
+
+.item-info
+  &__type
+    padding 7px 15px
+    font-size 12px
+    text-transform uppercase
+    margin 0
+    color $item-info-type-text-color
+    background $item-info-type-background
+
+  &__id
+    margin 0
+    padding 10px 15px
+    color $item-info-id-text-color
+
+.item-props
+  margin 15px 0
+  padding 0
+  list-style none
+
+  &__prop
+    padding 0 15px
+    margin-bottom 5px
+
+  &__key
+    display inline-block
+    font-weight 800
+    color $item-info-props-key-text-color
+    margin-right 10px
+
+  &__value
+    color $item-info-props-value-text-color
 

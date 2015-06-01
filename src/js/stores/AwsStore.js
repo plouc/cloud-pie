@@ -11,6 +11,9 @@ function resetActive() {
             subnet.active = false;
             subnet.instances.forEach(instance => {
                 instance.active = false;
+                instance.blockDeviceMappings.forEach(volume => {
+                    volume.active = false;
+                });
             });
         });
         vpc.autoscalings.forEach(autoscaling => {
@@ -74,7 +77,6 @@ module.exports = AwsStore = Reflux.createStore({
                 break;
 
             case 'autoscaling':
-                console.log(data);
                 _stack.vpcs.forEach(vpc => {
                     vpc.autoscalings.forEach(autoscaling => {
                         autoscaling.active = autoscaling.name === data.name;
@@ -99,6 +101,15 @@ module.exports = AwsStore = Reflux.createStore({
                 break;
 
             case 'volume':
+                _stack.vpcs.forEach(vpc => {
+                    vpc.subnets.forEach(subnet => {
+                        subnet.instances.forEach(instance => {
+                            instance.blockDeviceMappings.forEach(volume => {
+                                volume.active = volume.ebs.id === data.ebs.id;
+                            });
+                        });
+                    });
+                });
                 break;
 
             case 'lb':

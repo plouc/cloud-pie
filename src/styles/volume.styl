@@ -1,7 +1,25 @@
 .volume
+  cursor pointer
   &__wrapper
     fill $volume-background
 
   &__label__text
-    fill rgb(207, 244, 222)
+    fill $volume-text-color
     font-size 11px
+
+  &:hover
+    .volume
+      &__wrapper
+        fill $volume-background-hover
+
+      &__label__text
+        fill $volume-text-color-hover
+
+  &._is-active,
+  &._is-active:hover
+    .volume
+      &__wrapper
+        fill $volume-background-active
+
+      &__label__text
+        fill $volume-text-color-active
