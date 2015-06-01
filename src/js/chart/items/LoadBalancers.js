@@ -1,4 +1,4 @@
-var d3    = require('d3/d3');
+
 var icons = require('./../icons');
 
 module.exports = function (clickHandler) {
