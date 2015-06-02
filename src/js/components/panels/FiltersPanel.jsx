@@ -34,14 +34,14 @@ export default React.createClass({
     },
 
     render() {
-        var classes = 'filters-panel';
+        var classes = 'panel panel--left';
         if (this.state.opened === true) {
             classes += ' _is-opened';
         }
 
         return (
             <div className={classes}>
-                <div className="filters-panel__close" onClick={this.onToggleClick}>filters</div>
+                <div className="panel__close" onClick={this.onToggleClick}>filters</div>
                 <Filters/>
             </div>
         );

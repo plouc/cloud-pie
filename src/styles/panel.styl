@@ -1,0 +1,53 @@
+.panel
+  display block
+  position fixed
+  width 20%
+  height 100%
+  top    0
+  bottom 0
+  background $panel-background
+  z-index 100
+  color $panel-text-color
+  font-size 14px
+  -webkit-transition transform 200ms
+  box-shadow 0 0 24px rgba(0, 0, 0, 0.35)
+
+  &__close
+    position absolute
+    width  120px
+    height 32px
+    display block
+    font-size 12px
+    text-align center
+    padding 7px 11px
+    background $panel-close-background
+    color      $panel-close-text-color
+    cursor pointer
+    transform rotate(-90deg)
+
+    &:hover
+      background $panel-close-background-hover
+      color      $panel-close-text-color-hover
+
+  &._is-opened
+    transform translate3d(0, 0, 0)
+
+  &--right
+    right 0
+    transform translate3d(100%, 0, 0)
+
+    .panel__close
+      top  108px
+      left 0
+      border-radius 2px
+      transform-origin 0 100%
+
+  &--left
+    left 0
+    transform translate3d(-100%, 0, 0)
+
+    .panel__close
+      top   20px
+      right 0
+      transform-origin 100% 0
+      border-radius 0 0 3px 3px

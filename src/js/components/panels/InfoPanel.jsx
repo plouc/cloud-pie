@@ -34,14 +34,14 @@ export default React.createClass({
     },
 
     render() {
-        var classes = 'info-panel';
+        var classes = 'panel panel--right';
         if (this.state.opened === true) {
             classes += ' _is-opened';
         }
 
         return (
             <div className={classes}>
-                <div className="info-panel__close" onClick={this.onToggleClick}>info</div>
+                <div className="panel__close" onClick={this.onToggleClick}>info</div>
                 <ItemInfo/>
             </div>
         );
