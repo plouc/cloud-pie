@@ -3,6 +3,8 @@
   position fixed
   width 20%
   height 100%
+  overflow-x visible
+  overflow-y auto
   left 0
   top 0
   bottom 0
@@ -12,6 +14,7 @@
   font-size 14px
   transform translate3d(-100%, 0, 0)
   -webkit-transition transform 200ms
+  box-shadow 0 0 20px rgba(0, 0, 0, 0.35)
 
   &__close
     position absolute
@@ -38,10 +41,19 @@
     transform translate3d(0, 0, 0)
 
 .filters
-  &__title
-    margin 0
-    padding 9px 15px
-    color #e0c671
+  &__widget
+    &__title
+      margin 0
+      padding 12px 15px
+      color #e0c671
+      border-bottom 1px solid #0a0c15
+
+    &__body
+      display none
+
+    &._is-opened
+      .filters__widget__body
+        display block
 
   &__controls
     font-size 12px

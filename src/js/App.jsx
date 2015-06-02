@@ -1,10 +1,12 @@
-var React        = require('react');
-var ChartWrapper = require('./components/ChartWrapper.jsx');
-var AwsActions   = require('./actions/AwsActions');
-var InfoPanel    = require('./components/panels/InfoPanel.jsx');
-var FiltersPanel = require('./components/panels/FiltersPanel.jsx');
+import React        from 'react';
+import ChartWrapper from './components/ChartWrapper.jsx';
+import AwsActions   from './actions/AwsActions';
+import InfoPanel    from './components/panels/InfoPanel.jsx';
+import FiltersPanel from './components/panels/FiltersPanel.jsx';
 
 var App = React.createClass({
+    displayName: 'App',
+
     render() {
         return (
             <div>

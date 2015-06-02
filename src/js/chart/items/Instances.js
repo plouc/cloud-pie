@@ -1,8 +1,8 @@
-var d3      = require('d3/d3');
-var Volumes = require('./Volumes');
-var layout  = require('./../Layout');
+import d3      from 'd3/d3';
+import volumes from './Volumes';
+import layout  from './../Layout';
 
-module.exports = function (clickHandler) {
+export default function (clickHandler) {
     return function () {
         var instances = this.selectAll('.instance')
             .data(d => d.instances)
@@ -69,6 +69,6 @@ module.exports = function (clickHandler) {
             .remove()
         ;
 
-        instances.call(Volumes(clickHandler));
+        instances.call(volumes(clickHandler));
     };
-};
+}

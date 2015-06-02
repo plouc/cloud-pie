@@ -1,9 +1,17 @@
-var React          = require('react');
-var Reflux         = require('reflux');
-var FiltersActions = require('./../../actions/FiltersActions');
+import React          from 'react';
+import FiltersActions from './../../actions/FiltersActions';
 
-module.exports = Filter = React.createClass({
-    _onClick() {
+export default React.createClass({
+    displayName: 'Filter',
+
+    propTypes: {
+        filter: React.PropTypes.shape({
+            label:  React.PropTypes.string,
+            active: React.PropTypes.boolean
+        }).isRequired
+    },
+
+    onClick() {
         FiltersActions.toggle(this.props.filter);
     },
 
@@ -14,7 +22,7 @@ module.exports = Filter = React.createClass({
         }
 
         return (
-            <div className={classes} onClick={this._onClick}>{ this.props.filter.label }</div>
+            <div className={classes} onClick={this.onClick}>{ this.props.filter.label }</div>
         );
     }
 });

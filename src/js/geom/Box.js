@@ -1,8 +1,21 @@
-var Point  = require('./Point');
-var Anchor = require('./Anchor');
-
+/* @flow */
+import Point  from './Point';
+import Anchor from './Anchor';
 
 class Box {
+    center: Point;
+    origin: Point;
+
+    width:  number;
+    height: number;
+
+    anchors: {
+        top:    Anchor;
+        right:  Anchor;
+        bottom: Anchor;
+        left:   Anchor;
+    };
+
     constructor() {
         this.center = new Point(0, 0);
         this.origin = new Point(0, 0);
@@ -18,7 +31,7 @@ class Box {
         };
     }
 
-    setOrigin(origin) {
+    setOrigin(origin: Point): Box {
         this.origin = origin;
 
         this.center.setXY(
@@ -29,7 +42,7 @@ class Box {
         return this;
     }
 
-    setCenter(center) {
+    setCenter(center: Point): Box {
         this.center = center;
 
         this.origin.setXY(
@@ -40,7 +53,7 @@ class Box {
         return this;
     }
 
-    setDimensions(width, height) {
+    setDimensions(width: number, height: number): Box {
         this.width  = width;
         this.height = height;
 
@@ -52,30 +65,26 @@ class Box {
         return this;
     }
 
-    anchor(direction) {
+    anchor(direction: string): Point {
         switch (direction) {
             case 'top':
                 return new Point(this.center.x, this.origin.y);
-                break;
 
             case 'right':
                 return new Point(this.origin.x + this.width, this.center.y);
-                break;
 
             case 'bottom':
                 return new Point(this.center.x, this.origin.y + this.height);
-                break;
 
             case 'left':
                 return new Point(this.origin.x, this.center.y);
-                break;
 
             default:
                 throw `Invalid direction ${ direction }`;
         }
     }
 
-    setWidth(width) {
+    setWidth(width: number): Box {
         this.width  = width;
 
         this.center.x = this.origin.x + this.width / 2;
@@ -83,7 +92,7 @@ class Box {
         return this;
     }
 
-    setHeight(height) {
+    setHeight(height: number): Box {
         this.height = height;
 
         this.center.y = this.origin.y + this.height / 2;
@@ -92,4 +101,4 @@ class Box {
     }
 }
 
-module.exports = Box;
+export default Box;

@@ -1,10 +1,12 @@
-var React         = require('react');
-var Reflux        = require('reflux');
-var PanelsStore   = require('./../../stores/PanelsStore');
-var PanelsActions = require('./../../actions/PanelsActions');
-var ItemInfo      = require('./../ItemInfo.jsx');
+import React         from 'react';
+import Reflux        from 'reflux';
+import PanelsStore   from './../../stores/PanelsStore';
+import PanelsActions from './../../actions/PanelsActions';
+import ItemInfo      from './../ItemInfo.jsx';
 
-module.exports = InfoPanel = React.createClass({
+export default React.createClass({
+    displayName: 'InfoPanel',
+
     mixins: [
         Reflux.ListenerMixin
     ],

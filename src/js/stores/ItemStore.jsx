@@ -1,11 +1,12 @@
-var Reflux        = require('reflux');
-var ItemActions   = require('./../actions/ItemActions');
-var PanelsActions = require('./../actions/PanelsActions');
+/* @flow */
+import Reflux        from 'reflux';
+import ItemActions   from './../actions/ItemActions';
+import PanelsActions from './../actions/PanelsActions';
 
-module.exports = ItemStore = Reflux.createStore({
+export default Reflux.createStore({
     listenables: ItemActions,
 
-    set(itemType, itemInfo) {
+    set(itemType: string, itemInfo: Object) {
         PanelsActions.open('info');
 
         this.trigger(itemType, itemInfo);

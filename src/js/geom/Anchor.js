@@ -1,8 +1,17 @@
+import Point from './Point';
+
 class Anchor {
-    constructor(origin, options = {}) {
+
+    origin:  Point;
+    spacing: number;
+    count:   number;
+    points:  Array;
+
+    constructor(origin: { x: number; y: number; }, options: Object = {}) {
         options = options || {};
+
         this.origin     = origin;
-        this.spacing    = options.spacing || 50;
+        this.spacing    = options.spacing || 50;
         this.count      = 0;
         this.points     = [];
         this.index      = 0;
@@ -11,7 +20,7 @@ class Anchor {
         this.points = [this.origin];
     }
 
-    setOrigin() {
+    setOrigin(origin: { x: number; y: number; }) {
         this.origin = origin;
     }
 
@@ -41,7 +50,7 @@ class Anchor {
         }
     }
 
-    get() {
+    get(): { x: number; y: number; } {
         return this.points[this.index];
     }
 
@@ -56,4 +65,4 @@ class Anchor {
     }
 }
 
-module.exports = Anchor;
+export default Anchor;

@@ -1,13 +1,11 @@
-var React                 = require('react');
-var VpcFilters            = require('./VpcFilters.jsx');
-var InstanceFilters       = require('./InstanceFilters.jsx');
-var CloudFormationFilters = require('./CloudFormationFilters.jsx');
+import React                 from 'react';
+import VpcFilters            from './VpcFilters.jsx';
+import CloudFormationFilters from './CloudFormationFilters.jsx';
 
-module.exports = Filters = React.createClass({
+export default React.createClass({
+    displayName: 'Filters',
+
     render() {
-
-        //<InstanceFilters/>
-
         return (
             <div>
                 <VpcFilters/>

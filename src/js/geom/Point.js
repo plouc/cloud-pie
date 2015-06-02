@@ -1,7 +1,13 @@
-var _ = require('lodash');
+/* @flow */
+import _ from 'lodash';
+
+export default Point;
 
 class Point {
-    constructor(x, y) {
+    x: number;
+    y: number;
+
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
@@ -9,7 +15,7 @@ class Point {
     /**
      * @returns {Point}
      */
-    clone() {
+    clone(): Point {
         return new Point(this.x, this.y);
     }
 
@@ -19,7 +25,7 @@ class Point {
      *
      * @returns {Point}
      */
-    setXY(x, y) {
+    setXY(x: number, y: number): Point {
         this.x = x;
         this.y = y;
 
@@ -32,7 +38,7 @@ class Point {
      * @param {Number} y
      * @returns {Point}
      */
-    offset(x, y) {
+    offset(x: number, y: number): Point {
         this.x += x;
         this.y += y;
 
@@ -42,22 +48,22 @@ class Point {
     /**
      * @returns {boolean}
      */
-    isDefault() {
+    isDefault(): boolean {
         return this.x === 0 && this.y === 0;
+    }
+
+    /**
+     * Compute center for given points.
+     *
+     * @param {Array<Point>} points
+     * @returns {Point}
+     */
+    static centerFromPoints(points: Array<Point>): Point {
+        return new Point(
+            _.sum(_.pluck(points, 'x')) / points.length,
+            _.sum(_.pluck(points, 'y')) / points.length
+        );
     }
 }
 
-/**
- * Compute center for given points.
- *
- * @param {Array} points
- * @returns {Point}
- */
-Point.centerFromPoints = function (points) {
-    return new Point(
-        _.sum(_.pluck(points, 'x')) / points.length,
-        _.sum(_.pluck(points, 'y')) / points.length
-    );
-};
-
-module.exports = Point;
+export default Point;

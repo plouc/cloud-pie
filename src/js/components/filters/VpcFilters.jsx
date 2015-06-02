@@ -1,10 +1,12 @@
-var React          = require('react');
-var Reflux         = require('reflux');
-var FiltersStore   = require('./../../stores/FiltersStore');
-var Filter         = require('./Filter.jsx');
-var FilterControls = require('./FilterControls.jsx');
+import React         from 'react';
+import Reflux        from 'reflux';
+import FiltersStore  from './../../stores/FiltersStore';
+import Filter        from './Filter.jsx';
+import FiltersWidget from './FiltersWidget.jsx';
 
-module.exports = VpcFilters = React.createClass({
+export default React.createClass({
+    displayName: 'VpcFilters',
+
     mixins: [
         Reflux.ListenerMixin
     ],
@@ -16,30 +18,26 @@ module.exports = VpcFilters = React.createClass({
     },
 
     componentWillMount() {
-        this.listenTo(FiltersStore, this._onFiltersUpdate);
+        this.listenTo(FiltersStore, this.onFiltersUpdate);
     },
 
-    _onFiltersUpdate(filters) {
+    onFiltersUpdate(filters) {
         this.setState({
             filter: filters.vpc.id
         });
     },
 
     render() {
-        if (this.state.filter === null) {
-            return null;
-        }
+        if (this.state.filter === null) { return null; }
 
         var filterNodes = this.state.filter.filters.map(filter => {
             return <Filter key={ filter.value } filter={ filter } />;
         });
 
         return (
-            <div>
-                <h4 className="filters__title">VPC by ID</h4>
-                <FilterControls filter={ this.state.filter }/>
+            <FiltersWidget filter={this.state.filter} title="VPC by ID" filterId="filter.vpc.id">
                 {filterNodes}
-            </div>
+            </FiltersWidget>
         );
     }
 });

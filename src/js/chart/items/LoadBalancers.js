@@ -1,4 +1,5 @@
-var icons = require('./../icons');
+import d3    from 'd3/d3';
+import icons from './../icons';
 
 var line = d3.svg.line()
     .x(d => d.x)
@@ -6,7 +7,7 @@ var line = d3.svg.line()
     .interpolate('basis')
 ;
 
-var lbPaths = function (d) {
+var lbPaths = function () {
     var paths = this.selectAll('.lb__link').data(lb => lb.paths);
 
     // Enter
@@ -32,7 +33,7 @@ var lbPaths = function (d) {
     ;
 };
 
-module.exports = function (clickHandler) {
+export default function (clickHandler) {
     return function () {
         var loadBalancers = this.selectAll('.lb')
             .data(d => d.loadBalancers, d => d.name)
@@ -49,7 +50,7 @@ module.exports = function (clickHandler) {
                 var icon = lbEl.append('g')
                     .attr('class', 'lb__icon')
                     .attr('transform', `translate(${ bottomAnchor.x }, ${ bottomAnchor.y }) scale(0)`)
-                    .on('click', lb => {
+                    .on('click', () => {
                         clickHandler('lb', lb);
                     })
                 ;
@@ -80,4 +81,4 @@ module.exports = function (clickHandler) {
             .remove()
         ;
     };
-};
+}

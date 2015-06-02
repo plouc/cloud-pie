@@ -1,7 +1,9 @@
-var React      = require('react');
-var Properties = require('./ItemProperties.jsx');
+import React      from 'react';
+import Properties from './ItemProperties.jsx';
 
-module.exports = InstanceItem = React.createClass({
+export default React.createClass({
+    displayName: 'InstanceItem',
+
     render() {
         var data = this.props.data;
 

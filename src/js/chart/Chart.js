@@ -1,15 +1,15 @@
-var d3            = require('d3/d3');
-var _             = require('lodash');
-var layout        = require('./Layout');
-var Anchor        = require('./../geom/Anchor');
-var Box           = require('./../geom/Box');
-var Point         = require('./../geom/Point');
-var Path          = require('./../geom/Path');
-var VpcPeerings   = require('./items/VpcPeerings');
-var Vpcs          = require('./items/Vpcs');
+import d3          from 'd3/d3';
+import _           from 'lodash';
+import layout      from './Layout';
+import Anchor      from './../geom/Anchor';
+import Box         from './../geom/Box';
+import Point       from './../geom/Point';
+import Path        from './../geom/Path';
+import vpcPeerings from './items/VpcPeerings';
+import vpcNodes    from './items/Vpcs';
 
 
-module.exports = {
+export default {
     create(el) {
         var schema = d3.select(el).append('svg')
             // @todo compute required dimensions
@@ -298,7 +298,7 @@ module.exports = {
             }
         });
 
-        schema.call(Vpcs(vpcs, clickHandler));
-        schema.call(VpcPeerings(peeringsData, clickHandler));
+        schema.call(vpcNodes(vpcs, clickHandler));
+        schema.call(vpcPeerings(peeringsData, clickHandler));
     }
 };

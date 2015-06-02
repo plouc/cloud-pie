@@ -1,6 +1,6 @@
-var Reflux = require('reflux');
+import Reflux from 'reflux';
 
-module.exports = FiltersActions = Reflux.createActions([
+export default Reflux.createActions([
     'setData',
     'selectNone',
     'selectAll',

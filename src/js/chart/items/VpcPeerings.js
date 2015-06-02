@@ -1,7 +1,7 @@
-var d3    = require('d3/d3');
-var icons = require('./../icons');
+import d3    from 'd3/d3';
+import icons from './../icons';
 
-module.exports = function (data, clickHandler) {
+export default function (data, clickHandler) {
     return function () {
         var line = d3.svg.line()
             .x(d => d.x)
@@ -17,20 +17,20 @@ module.exports = function (data, clickHandler) {
         peeringNodes.enter().append('g')
             .attr('class', 'vpc__peering')
             .each(function (peering) {
-                var _this = d3.select(this);
+                var peeringEl = d3.select(this);
 
-                _this.append('path')
+                peeringEl.append('path')
                     .datum(peering.points)
                     .attr('class', 'vpc__peering__path')
                     .attr('d', line)
                 ;
 
-                var reqIcon = _this.append('g')
+                var reqIcon = peeringEl.append('g')
                     .attr('class', 'vpc__peering__icon vpc__peering__icon--req')
                     .attr('transform', `translate(${ peering.points[0].x }, ${ peering.points[0].y })`)
                 ;
 
-                var accIcon = _this.append('g')
+                var accIcon = peeringEl.append('g')
                     .attr('class', 'vpc__peering__icon vpc__peering__icon--acc')
                     .attr('transform', `translate(${ peering.points[4].x }, ${ peering.points[4].y })`)
                 ;
@@ -38,8 +38,8 @@ module.exports = function (data, clickHandler) {
                 icons.vpcPeering(reqIcon);
                 icons.vpcPeering(accIcon);
 
-                reqIcon.on('click', d => { clickHandler('peering', d.peering); });
-                accIcon.on('click', d => { clickHandler('peering', d.peering); });
+                reqIcon.on('click', () => { clickHandler('peering', peering.peering); });
+                accIcon.on('click', () => { clickHandler('peering', peering.peering); });
             })
         ;
 
@@ -47,19 +47,19 @@ module.exports = function (data, clickHandler) {
         peeringNodes
             .attr('class', d => `vpc__peering${ d.peering.active ? ' _is-active' : '' }`)
             .each(function (peering) {
-                var _this = d3.select(this);
-                _this.select('.vpc__peering__path')
+                var peeringEl = d3.select(this);
+                peeringEl.select('.vpc__peering__path')
                     .datum(peering.points)
                 .transition().duration(400)
                     .attr('d', line)
                 ;
 
-                _this.select('.vpc__peering__icon--req')
+                peeringEl.select('.vpc__peering__icon--req')
                     .transition().duration(400)
                     .attr('transform', `translate(${ peering.points[0].x }, ${ peering.points[0].y })`)
                 ;
 
-                _this.select('.vpc__peering__icon--acc')
+                peeringEl.select('.vpc__peering__icon--acc')
                     .transition().duration(400)
                     .attr('transform', `translate(${ peering.points[4].x }, ${ peering.points[4].y })`)
                 ;
@@ -71,4 +71,4 @@ module.exports = function (data, clickHandler) {
             .remove()
         ;
     };
-};
+}

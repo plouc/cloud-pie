@@ -1,18 +1,23 @@
-var Reflux         = require('reflux');
-var AwsActions     = require('./../actions/AwsActions');
-var FiltersActions = require('./../actions/FiltersActions');
-var FiltersStore   = require('./../stores/FiltersStore');
-var request        = require('superagent');
-var _              = require('lodash');
+/* @flow */
+import Reflux         from 'reflux';
+import AwsActions     from './../actions/AwsActions';
+import FiltersActions from './../actions/FiltersActions';
+import FiltersStore   from './../stores/FiltersStore';
+import request        from 'superagent';
+import _              from 'lodash';
 
-var _stack         = null;
-var _filteredStack = null;
+var currentStack         = {
+    vpcs:          [],
+    loadBalancers: [],
+    vpcPeerings:   []
+};
+var currentFilteredStack = currentStack;
 
 /**
  * Reset all stack items (active: false)
  */
 function resetActive() {
-    _filteredStack.vpcs.forEach(vpc => {
+    currentFilteredStack.vpcs.forEach(vpc => {
         vpc.active = false;
         vpc.subnets.forEach(subnet => {
             subnet.active = false;
@@ -34,17 +39,17 @@ function resetActive() {
         });
     });
 
-    _filteredStack.loadBalancers.forEach(lb => {
+    currentFilteredStack.loadBalancers.forEach(lb => {
         lb.active = false;
     });
 
-    _filteredStack.vpcPeerings.forEach(peering => {
+    currentFilteredStack.vpcPeerings.forEach(peering => {
         peering.active = false;
     });
 }
 
 function filterStack(filters) {
-    _filteredStack = _.cloneDeep(_stack);
+    currentFilteredStack = _.cloneDeep(currentStack);
     resetActive();
 
     if (filters.vpc.id.active) {
@@ -54,7 +59,7 @@ function filterStack(filters) {
                 vpcIds.push(filter.value);
             }
         });
-        _filteredStack.vpcs = _.filter(_filteredStack.vpcs, vpc => {
+        currentFilteredStack.vpcs = _.filter(currentFilteredStack.vpcs, vpc => {
             return _.includes(vpcIds, vpc.id);
         });
     }
@@ -66,7 +71,7 @@ function filterStack(filters) {
                 cfStackIds.push(filter.value);
             }
         });
-        _filteredStack.vpcs.forEach(vpc => {
+        currentFilteredStack.vpcs.forEach(vpc => {
             vpc.subnets.forEach(subnet => {
                 subnet.instances = _.filter(subnet.instances, instance => {
                     return _.has(instance.tags, 'aws:cloudformation:stack-id') &&
@@ -77,7 +82,7 @@ function filterStack(filters) {
     }
 }
 
-module.exports = AwsStore = Reflux.createStore({
+export default Reflux.createStore({
     listenables: AwsActions,
 
     init() {
@@ -89,24 +94,22 @@ module.exports = AwsStore = Reflux.createStore({
      */
     fetch() {
         request.get('/aws.json').end((err, res) => {
-            if (err) {
-                throw err;
-            }
+            if (err) { throw err; }
 
-            _stack = res.body;
+            currentStack = res.body;
 
-            _stack.vpcs= _stack.vpcs.map(vpc => {
+            currentStack.vpcs = currentStack.vpcs.map(vpc => {
                 vpc.subnets = _.filter(vpc.subnets, subnet => subnet.instances.length > 0);
                 return vpc;
             });
 
-            _filteredStack = _.cloneDeep(_stack);
+            currentFilteredStack = _.cloneDeep(currentStack);
 
-            FiltersActions.setData(_stack);
+            FiltersActions.setData(currentStack);
 
             resetActive();
 
-            this.trigger(_filteredStack);
+            this.trigger(currentFilteredStack);
         });
     },
 
@@ -116,16 +119,16 @@ module.exports = AwsStore = Reflux.createStore({
      * @param {String} type
      * @param {Object} data
      */
-    activate(type, data) {
+    activate(type: string, data: Object) {
         resetActive();
 
         switch (type) {
             case 'vpc':
-                _filteredStack.vpcs.forEach(vpc => { vpc.active = vpc.id === data.id });
+                currentFilteredStack.vpcs.forEach(vpc => { vpc.active = vpc.id === data.id; });
                 break;
 
             case 'instance':
-                _filteredStack.vpcs.forEach(vpc => {
+                currentFilteredStack.vpcs.forEach(vpc => {
                     vpc.subnets.forEach(subnet => {
                         subnet.instances.forEach(instance => {
                             instance.active = instance.id === data.id;
@@ -135,13 +138,13 @@ module.exports = AwsStore = Reflux.createStore({
                 break;
 
             case 'peering':
-                _filteredStack.vpcPeerings.forEach(peering => {
+                currentFilteredStack.vpcPeerings.forEach(peering => {
                     peering.active = peering.id === data.id;
                 });
                 break;
 
             case 'autoscaling':
-                _filteredStack.vpcs.forEach(vpc => {
+                currentFilteredStack.vpcs.forEach(vpc => {
                     vpc.autoscalings.forEach(autoscaling => {
                         autoscaling.active = autoscaling.name === data.name;
                     });
@@ -149,7 +152,7 @@ module.exports = AwsStore = Reflux.createStore({
                 break;
 
             case 'subnet':
-                _filteredStack.vpcs.forEach(vpc => {
+                currentFilteredStack.vpcs.forEach(vpc => {
                     vpc.subnets.forEach(subnet => {
                         subnet.active = subnet.id === data.id;
                     });
@@ -157,7 +160,7 @@ module.exports = AwsStore = Reflux.createStore({
                 break;
 
             case 'igw':
-                _filteredStack.vpcs.forEach(vpc => {
+                currentFilteredStack.vpcs.forEach(vpc => {
                     if (vpc.internetGateway) {
                         vpc.internetGateway.active = vpc.internetGateway.id === data.id;
                     }
@@ -165,7 +168,7 @@ module.exports = AwsStore = Reflux.createStore({
                 break;
 
             case 'volume':
-                _filteredStack.vpcs.forEach(vpc => {
+                currentFilteredStack.vpcs.forEach(vpc => {
                     vpc.subnets.forEach(subnet => {
                         subnet.instances.forEach(instance => {
                             instance.blockDeviceMappings.forEach(volume => {
@@ -177,7 +180,7 @@ module.exports = AwsStore = Reflux.createStore({
                 break;
 
             case 'lb':
-                _filteredStack.vpcs.forEach(vpc => {
+                currentFilteredStack.vpcs.forEach(vpc => {
                     vpc.loadBalancers.forEach(lb => {
                         lb.active = lb.name === data.name;
                     });
@@ -188,11 +191,11 @@ module.exports = AwsStore = Reflux.createStore({
                 throw `Invalid item type "${ type }"`;
         }
 
-        this.trigger(_filteredStack);
+        this.trigger(currentFilteredStack);
     },
 
     filter(filters) {
         filterStack(filters);
-        this.trigger(_filteredStack);
+        this.trigger(currentFilteredStack);
     }
 });

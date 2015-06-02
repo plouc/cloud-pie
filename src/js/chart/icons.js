@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     vpc(el) {
         var vpc = el.append('g').attr('transform', 'translate(-50, -50)');
 

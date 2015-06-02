@@ -1,10 +1,12 @@
-var React          = require('react');
-var Reflux         = require('reflux');
-var FiltersStore   = require('./../../stores/FiltersStore');
-var Filter         = require('./Filter.jsx');
-var FilterControls = require('./FilterControls.jsx');
+import React         from 'react';
+import Reflux        from 'reflux';
+import FiltersStore  from './../../stores/FiltersStore';
+import Filter        from './Filter.jsx';
+import FiltersWidget from './FiltersWidget.jsx';
 
-module.exports = CloudFormationFilters = React.createClass({
+export default React.createClass({
+    displayName: 'CloudFormationFilters',
+
     mixins: [
         Reflux.ListenerMixin
     ],
@@ -16,30 +18,26 @@ module.exports = CloudFormationFilters = React.createClass({
     },
 
     componentWillMount() {
-        this.listenTo(FiltersStore, this._onFiltersUpdate);
+        this.listenTo(FiltersStore, this.onFiltersUpdate);
     },
 
-    _onFiltersUpdate(filters) {
+    onFiltersUpdate(filters) {
         this.setState({
             filter: filters.cloudFormation.id
         });
     },
 
     render() {
-        if (this.state.filter === null) {
-            return null;
-        }
+        if (this.state.filter === null) { return null; }
 
         var filterNodes = this.state.filter.filters.map(filter => {
             return <Filter key={ filter.value } filter={ filter } />;
         });
 
         return (
-            <div>
-                <h4 className="filters__title">CloudFormation stack</h4>
-                <FilterControls filter={ this.state.filter }/>
+            <FiltersWidget filter={this.state.filter}>
                 {filterNodes}
-            </div>
+            </FiltersWidget>
         );
     }
 });

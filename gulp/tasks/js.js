@@ -1,12 +1,14 @@
 var gulp       = require('gulp');
 var browserify = require('browserify');
-var reactify   = require('reactify');
+var babelify   = require('babelify');
+var flow       = require('gulp-flowtype');
 var uglify     = require('gulp-uglify');
 var source     = require('vinyl-source-stream');
 var buffer     = require('vinyl-buffer');
 var rename     = require('gulp-rename');
 var watchify   = require('watchify');
 var gutil      = require('gulp-util');
+var eslint     = require('gulp-eslint');
 var chalk      = require('chalk');
 
 
@@ -20,9 +22,9 @@ function getBundler(isDev) {
         fullPaths:    true // for watchify
     });
 
-    bundler.transform(reactify, {
-        es6: true
-    });
+    bundler.transform(babelify.configure({
+        optional: ['es7.asyncFunctions']
+    }));
 
     return bundler;
 }
@@ -75,6 +77,17 @@ gulp.task('watch:js:dev', function () {
 });
 
 
+gulp.task('lint', function () {
+    return gulp.src(['./src/js/**/*.jsx', './src/js/**/*.js'])
+        .pipe(eslint({
+            useEslintrc: true
+        }))
+        .pipe(eslint.format())
+        .pipe(flow())
+    ;
+});
+
+
 gulp.task('js:dev', function () {
     return getBundler(true)
         .bundle()
@@ -85,9 +98,9 @@ gulp.task('js:dev', function () {
 
 
 gulp.task('js', ['js:dev'], function () {
-    return gulp.src('./dist/gallery.js')
+    return gulp.src('./dist/js/app.js')
         .pipe(uglify())
         .pipe(rename({suffix: '.min'}))
-        .pipe(gulp.dest('./dist'))
+        .pipe(gulp.dest('./dist/js'))
     ;
 });

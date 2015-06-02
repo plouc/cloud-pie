@@ -1,8 +1,8 @@
-var d3        = require('d3/d3');
-var Instances = require('./Instances');
-var layout    = require('./../Layout');
+import d3        from 'd3/d3';
+import instances from './Instances';
+import layout    from './../Layout';
 
-module.exports = function (clickHandler) {
+export default function (clickHandler) {
     return function () {
         var subnets = this.selectAll('.subnet')
             .data(vpc => vpc.subnets, subnet => subnet.id)
@@ -20,7 +20,7 @@ module.exports = function (clickHandler) {
                     .attr('class', 'subnet__wrapper')
                     .attr({ width: 10, height: subnet.box.height })
                     .attr({ rx: layout.subnet.borderRadius, ry: layout.subnet.borderRadius })
-                    .on('click', function (d) {
+                    .on('click', () => {
                         clickHandler('subnet', subnet);
                     })
                 ;
@@ -81,6 +81,6 @@ module.exports = function (clickHandler) {
             .remove()
         ;
 
-        subnets.call(Instances(clickHandler));
+        subnets.call(instances(clickHandler));
     };
-};
+}

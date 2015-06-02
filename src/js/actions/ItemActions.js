@@ -1,5 +1,5 @@
-var Reflux = require('reflux');
+import Reflux from 'reflux';
 
-module.exports = ItemActions = Reflux.createActions([
+export default Reflux.createActions([
     'set'
 ]);

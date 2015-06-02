@@ -1,28 +1,32 @@
-var Reflux         = require('reflux');
-var FiltersActions = require('./../actions/FiltersActions');
-var _              = require('lodash');
+/* @flow */
+import Reflux         from 'reflux';
+import FiltersActions from './../actions/FiltersActions';
 
-var _filters;
+var currentFilters;
 
-module.exports = FilterStore = Reflux.createStore({
+export default Reflux.createStore({
     listenables: FiltersActions,
 
-    setData(data) {
-        _filters = {
+    setData(data: Object) {
+        currentFilters = {
             vpc: {
                 id: {
+                    id:      'vpc.id',
+                    label:   'VPC',
                     active:  false,
                     filters: data.vpcs.map(vpc => {
                         return {
                             label:  vpc.tags.name ? vpc.tags.name : vpc.id,
                             active: true,
                             value:  vpc.id
-                        }
+                        };
                     })
                 }
             },
             instance: {
                 tag: {
+                    id:      'instance.tag',
+                    label:   'Instances tags',
                     active:  false,
                     filters: data.instanceTags.map(tag => {
                         return {
@@ -41,35 +45,37 @@ module.exports = FilterStore = Reflux.createStore({
             },
             cloudFormation: {
                 id: {
+                    id:      'cloud_formation.id',
+                    label:   'CloudFormation stacks',
                     active:  false,
                     filters: data.cloudFormationStacks.map(stack => {
                         return {
                             label:  stack.name,
                             active: true,
                             value:  stack.id
-                        }
+                        };
                     })
                 }
             }
         };
 
-        this.trigger(_filters);
+        this.trigger(currentFilters);
     },
 
-    selectAll(filter) {
+    selectAll(filter: Object) {
         if (!filter.filters) { return; }
-        filter.filters.forEach(filter => { filter.active = true; });
-        this.trigger(_filters);
+        filter.filters.forEach(f => { f.active = true; });
+        this.trigger(currentFilters);
     },
 
-    selectNone(filter) {
+    selectNone(filter: Object) {
         if (!filter.filters) { return; }
-        filter.filters.forEach(filter => { filter.active = false; });
-        this.trigger(_filters);
+        filter.filters.forEach(f => { f.active = false; });
+        this.trigger(currentFilters);
     },
 
-    toggle(filter) {
+    toggle(filter: Object) {
         filter.active = !filter.active;
-        this.trigger(_filters);
+        this.trigger(currentFilters);
     }
 });

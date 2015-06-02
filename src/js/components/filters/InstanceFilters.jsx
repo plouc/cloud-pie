@@ -1,10 +1,12 @@
-var React          = require('react');
-var Reflux         = require('reflux');
-var FiltersStore   = require('./../../stores/FiltersStore');
-var Filter         = require('./Filter.jsx');
-var FilterControls = require('./FilterControls.jsx');
+import React          from 'react';
+import Reflux         from 'reflux';
+import FiltersStore   from './../../stores/FiltersStore';
+import Filter         from './Filter.jsx';
+import FilterControls from './FilterControls.jsx';
 
-module.exports = InstanceFilters = React.createClass({
+export default React.createClass({
+    displayName: 'InstanceFilters',
+
     mixins: [
         Reflux.ListenerMixin
     ],
@@ -16,10 +18,10 @@ module.exports = InstanceFilters = React.createClass({
     },
 
     componentWillMount() {
-        this.listenTo(FiltersStore, this._onFiltersUpdate);
+        this.listenTo(FiltersStore, this.onFiltersUpdate);
     },
 
-    _onFiltersUpdate(filters) {
+    onFiltersUpdate(filters) {
         this.setState({
             filter: filters.instance.tag
         });

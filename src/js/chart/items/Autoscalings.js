@@ -1,5 +1,5 @@
-var d3    = require('d3/d3');
-var icons = require('./../icons');
+import d3    from 'd3/d3';
+import icons from './../icons';
 
 var line = d3.svg.line()
     .x(d => d.x)
@@ -7,7 +7,7 @@ var line = d3.svg.line()
     .interpolate('basis')
 ;
 
-var autoscalingPaths = function (d, i) {
+var autoscalingPaths = function () {
     var paths = this.selectAll('.autoscaling__link')
         .data(autoscaling => autoscaling.paths)
     ;
@@ -35,7 +35,7 @@ var autoscalingPaths = function (d, i) {
     ;
 };
 
-module.exports = function (clickHandler) {
+export default function (clickHandler) {
     return function () {
         var autoscalings = this.selectAll('.autoscaling')
             .data(d => d.autoscalings, d => d.name)
@@ -85,4 +85,4 @@ module.exports = function (clickHandler) {
             .remove()
         ;
     };
-};
+}

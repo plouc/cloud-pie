@@ -1,16 +1,18 @@
-var React            = require('react');
-var Reflux           = require('reflux');
-var ItemStore        = require('./../stores/ItemStore');
-var AutoscalingItem  = require('./items/AutoscalingItem.jsx');
-var InstanceItem     = require('./items/InstanceItem.jsx');
-var VpcItem          = require('./items/VpcItem.jsx');
-var SubnetItem       = require('./items/SubnetItem.jsx');
-var VolumeItem       = require('./items/VolumeItem.jsx');
-var IgwItem          = require('./items/IgwItem.jsx');
-var PeeringItem      = require('./items/PeeringItem.jsx');
-var LoadBalancerItem = require('./items/LoadBalancerItem.jsx');
+import React            from 'react';
+import Reflux           from 'reflux';
+import ItemStore        from './../stores/ItemStore';
+import AutoscalingItem  from './items/AutoscalingItem.jsx';
+import InstanceItem     from './items/InstanceItem.jsx';
+import VpcItem          from './items/VpcItem.jsx';
+import SubnetItem       from './items/SubnetItem.jsx';
+import VolumeItem       from './items/VolumeItem.jsx';
+import IgwItem          from './items/IgwItem.jsx';
+import PeeringItem      from './items/PeeringItem.jsx';
+import LoadBalancerItem from './items/LoadBalancerItem.jsx';
 
-module.exports = ItemInfo = React.createClass({
+export default React.createClass({
+    displayName: 'ItemInfo',
+
     mixins: [
         Reflux.ListenerMixin
     ],
@@ -39,34 +41,36 @@ module.exports = ItemInfo = React.createClass({
 
         switch (this.state.type) {
             case 'autoscaling':
-                infoNode = <AutoscalingItem data={this.state.data}/>
+                infoNode = <AutoscalingItem data={this.state.data}/>;
                 break;
 
             case 'instance':
-                infoNode = <InstanceItem data={this.state.data}/>
+                infoNode = <InstanceItem data={this.state.data}/>;
                 break;
 
             case 'vpc':
-                infoNode = <VpcItem data={this.state.data}/>
+                infoNode = <VpcItem data={this.state.data}/>;
                 break;
 
             case 'subnet':
-                infoNode = <SubnetItem data={this.state.data}/>
+                infoNode = <SubnetItem data={this.state.data}/>;
                 break;
 
             case 'volume':
-                infoNode = <VolumeItem data={this.state.data}/>
+                infoNode = <VolumeItem data={this.state.data}/>;
                 break;
 
             case 'igw':
-                infoNode = <IgwItem data={this.state.data}/>
+                infoNode = <IgwItem data={this.state.data}/>;
                 break;
 
             case 'peering':
-                infoNode = <PeeringItem data={this.state.data}/>
+                infoNode = <PeeringItem data={this.state.data}/>;
+                  break;
 
             case 'lb':
-                infoNode = <LoadBalancerItem data={this.state.data}/>
+                infoNode = <LoadBalancerItem data={this.state.data}/>;
+                  break;
 
             default:
                 break;

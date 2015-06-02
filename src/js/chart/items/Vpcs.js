@@ -1,12 +1,12 @@
-var d3            = require('d3/d3');
-var layout        = require('./../Layout');
-var icons         = require('./../icons');
-var Subnets       = require('./Subnets');
-var LoadBalancers = require('./LoadBalancers');
-var Autoscalings  = require('./Autoscalings');
+import d3            from 'd3/d3';
+import layout        from './../Layout';
+import icons         from './../icons';
+import subnets       from './Subnets';
+import loadBalancers from './LoadBalancers';
+import autoscalings  from './Autoscalings';
 
 
-module.exports = function (data, clickHandler) {
+export default function (data, clickHandler) {
     return function () {
         var vpcsNodes = this.selectAll('.vpc')
             .data(data, d => d.id)
@@ -15,47 +15,47 @@ module.exports = function (data, clickHandler) {
         // Enter
         vpcsNodes.enter().append('g')
             .attr('transform', d => `translate(${ d.box.origin.x }, 0)`)
-            .each(function (d) {
-                var vpc = d3.select(this);
+            .each(function (vpc) {
+                var vpcEl = d3.select(this);
 
-                vpc.append('rect')
+                vpcEl.append('rect')
                     .attr('class', 'vpc__wrapper')
                     .attr({ width: 10, height: 10 })
                     .attr({ rx: layout.vpc.borderRadius, ry: layout.vpc.borderRadius })
-                    .on('click', function (d) {
-                        clickHandler('vpc', d);
+                    .on('click', () => {
+                        clickHandler('vpc', vpc);
                     })
                 ;
 
-                var vpcIcon = vpc.append('g').attr('transform', 'translate(36, 30)');
+                var vpcIcon = vpcEl.append('g').attr('transform', 'translate(36, 30)');
                 icons.vpc(vpcIcon);
                 vpcIcon.append('text')
                     .attr('class', 'vpc__label__text')
                     .attr('text-anchor', 'start')
                     .attr('x', 24)
                     .attr('y', 5)
-                    .text(d.tags.name ? d.tags.name : d.id)
+                    .text(vpc.tags.name ? vpc.tags.name : vpc.id)
                 ;
 
-                vpcIcon.on('click', function (d) {
-                    clickHandler('vpc', d);
+                vpcIcon.on('click', () => {
+                    clickHandler('vpc', vpc);
                 });
 
-                if (d.internetGateway !== null) {
-                    var igwGroup = vpc.append('g')
+                if (vpc.internetGateway !== null) {
+                    var igwGroup = vpcEl.append('g')
                         .attr('class', 'igw')
-                        .attr('transform', `translate(${ d.box.width - 30 - layout.vpc.b.r }, 0)`)
+                        .attr('transform', `translate(${ vpc.box.width - 30 - layout.vpc.b.r }, 0)`)
                     ;
                     icons.igw(igwGroup);
                     igwGroup.append('text')
                         .attr('class', 'igw__label__text')
-                        .text(d.internetGateway.tags.name ? d.internetGateway.tags.name : d.internetGateway.id)
+                        .text(vpc.internetGateway.tags.name ? vpc.internetGateway.tags.name : vpc.internetGateway.id)
                         .attr('text-anchor', 'middle')
                         .attr('y', -40)
                     ;
 
-                    igwGroup.on('click', d => {
-                        clickHandler('igw', d.internetGateway);
+                    igwGroup.on('click', () => {
+                        clickHandler('igw', vpc.internetGateway);
                     });
                 }
             })
@@ -64,29 +64,29 @@ module.exports = function (data, clickHandler) {
         // Update
         vpcsNodes
             .attr('class', d => `vpc${ d.active ? ' _is-active' : '' }`)
-            .each(function (d) {
-                var _this = d3.select(this);
+            .each(function (vpc) {
+                var vpcEl = d3.select(this);
 
-                _this.select('.vpc__wrapper')
+                vpcEl.select('.vpc__wrapper')
                     .transition()
                     .duration(400)
-                    .attr('width', d.box.width)
-                    .attr('height', d.box.height)
+                    .attr('width', vpc.box.width)
+                    .attr('height', vpc.box.height)
                 ;
 
-                if (d.internetGateway !== null) {
-                    var igw = d.internetGateway;
-                    _this.selectAll('.igw')
-                        .attr('class', d => `igw${ igw.active ? ' _is-active' : '' }`)
+                if (vpc.internetGateway !== null) {
+                    var igw = vpc.internetGateway;
+                    vpcEl.selectAll('.igw')
+                        .attr('class', `igw${ igw.active ? ' _is-active' : '' }`)
                         .transition()
                         .duration(400)
-                        .attr('transform', `translate(${ d.box.width - 30 - layout.vpc.b.r }, 0)`)
+                        .attr('transform', `translate(${ vpc.box.width - 30 - layout.vpc.b.r }, 0)`)
                     ;
                 }
             })
             .transition()
             .duration(400)
-            .attr('transform', d => `translate(${ d.box.origin.x }, 0)`)
+            .attr('transform', vpc => `translate(${ vpc.box.origin.x }, 0)`)
         ;
 
         // Exit
@@ -94,8 +94,8 @@ module.exports = function (data, clickHandler) {
             .remove()
         ;
 
-        vpcsNodes.call(Subnets(clickHandler));
-        vpcsNodes.call(Autoscalings(clickHandler));
-        vpcsNodes.call(LoadBalancers(clickHandler));
+        vpcsNodes.call(subnets(clickHandler));
+        vpcsNodes.call(autoscalings(clickHandler));
+        vpcsNodes.call(loadBalancers(clickHandler));
     };
-};
+}

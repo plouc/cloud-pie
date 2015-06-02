@@ -1,10 +1,11 @@
-var chart = require('./../chart/Chart');
-var React = require('react');
-var _     = require('lodash');
+import chart from './../chart/Chart';
+import React from 'react';
+import _     from 'lodash';
 
-module.exports = Chart = React.createClass({
+export default React.createClass({
+    displayName: 'Chart',
+
     componentDidMount() {
-        //console.log('Chart.componentDidMount()');
         var el = this.getDOMNode();
         chart.create(el);
         chart.update(el, this.props.stack.vpcs, this.props.stack.vpcPeerings, {
@@ -22,6 +23,6 @@ module.exports = Chart = React.createClass({
     },
 
     render() {
-        return <div className="schema" />;
+      return <div className="schema" />;
     }
 });

@@ -1,6 +1,6 @@
-var Reflux = require('reflux');
+import Reflux from 'reflux';
 
-module.exports = AwsActions = Reflux.createActions([
+export default Reflux.createActions([
     'fetch',
     'activate'
 ]);

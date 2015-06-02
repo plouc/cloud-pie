@@ -1,7 +1,7 @@
-var d3     = require('d3/d3');
-var layout = require('./../Layout');
+import d3     from 'd3/d3';
+import layout from './../Layout';
 
-module.exports = function (clickHandler) {
+export default function (clickHandler) {
     return function () {
         var volumes = this.selectAll('.volume')
             .data(instance => instance.blockDeviceMappings)
@@ -13,26 +13,26 @@ module.exports = function (clickHandler) {
                 return `translate(${ i * layout.volume.size + i * layout.volume.spacing + layout.instance.padding }, ${ layout.instance.size - layout.volume.size - layout.instance.padding })`;
             })
             .each(function (volume) {
-                var _this = d3.select(this);
+                var volumeEl = d3.select(this)
+                    .on('click', d => {
+                        clickHandler('volume', d);
+                    })
+                ;
 
-                _this.append('rect')
+                volumeEl.append('rect')
                     .attr('class', 'volume__wrapper')
                     .attr('width',  layout.volume.size)
                     .attr('height', layout.volume.size)
                     .attr({ rx: layout.volume.borderRadius, ry: layout.volume.borderRadius })
                 ;
 
-                _this.append('text')
+                volumeEl.append('text')
                     .attr('class', 'volume__label__text')
                     .attr('text-anchor', 'middle')
                     .attr('x', layout.volume.size / 2)
                     .attr('y', 17)
                     .text(volume.ebs.ebs.size)
                 ;
-
-                _this.on('click', d => {
-                    clickHandler('volume', d);
-                });
             })
         ;
 
@@ -40,4 +40,4 @@ module.exports = function (clickHandler) {
             .attr('class', volume => `volume${ volume.active ? ' _is-active' : '' }`)
         ;
     };
-};
+}

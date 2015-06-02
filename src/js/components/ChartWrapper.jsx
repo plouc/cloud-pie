@@ -1,11 +1,13 @@
-var React       = require('react');
-var Reflux      = require('reflux');
-var Chart       = require('./Chart.jsx');
-var AwsStore    = require('./../stores/AwsStore');
-var AwsActions  = require('./../actions/AwsActions');
-var ItemActions = require('./../actions/ItemActions');
+import React       from 'react';
+import Reflux      from 'reflux';
+import Chart       from './Chart.jsx';
+import AwsStore    from './../stores/AwsStore';
+import AwsActions  from './../actions/AwsActions';
+import ItemActions from './../actions/ItemActions';
 
-module.exports = ChartWrapper = React.createClass({
+export default React.createClass({
+    displayName: 'ChartWrapper',
+
     mixins: [
         Reflux.ListenerMixin
     ],

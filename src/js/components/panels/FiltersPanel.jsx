@@ -1,10 +1,12 @@
-var React         = require('react');
-var Reflux        = require('reflux');
-var PanelsStore   = require('./../../stores/PanelsStore');
-var PanelsActions = require('./../../actions/PanelsActions');
-var Filters       = require('./../filters/Filters.jsx');
+import React         from 'react';
+import Reflux        from 'reflux';
+import PanelsStore   from './../../stores/PanelsStore';
+import PanelsActions from './../../actions/PanelsActions';
+import Filters       from './../filters/Filters.jsx';
 
-module.exports = FiltersPanel = React.createClass({
+export default React.createClass({
+    displayName: 'FiltersPanel',
+
     mixins: [
         Reflux.ListenerMixin
     ],

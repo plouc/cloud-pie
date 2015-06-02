@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     vpc:         { borderRadius: 4, spacing: 60, b: { t: 100, r: 20, b: 20, l: 20 } },
     autoscaling: { size: 36, spacing: 10, offset: { x: 25, y: -50 } },
     subnet:      { borderRadius: 3, spacing: 60, b: { t: 20,  r: 30, b: 20, l: 30 } },

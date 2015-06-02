@@ -1,7 +1,9 @@
-var React = require('react');
-var _     = require('lodash');
+import React from 'react';
+import _     from 'lodash';
 
-module.exports = ItemProperties = React.createClass({
+export default React.createClass({
+    displayName: 'ItemProperties',
+
     render() {
         var properties = this.props.properties;
 
