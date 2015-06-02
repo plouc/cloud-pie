@@ -35,7 +35,7 @@ export default React.createClass({
         });
 
         return (
-            <FiltersWidget filter={this.state.filter} title="VPC by ID" filterId="filter.vpc.id">
+            <FiltersWidget filter={this.state.filter}>
                 {filterNodes}
             </FiltersWidget>
         );

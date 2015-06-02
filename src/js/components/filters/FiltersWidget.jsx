@@ -41,11 +41,19 @@ export default React.createClass({
     },
 
     render() {
-        var classes = `filters__widget${ this.state.opened ? ' _is-opened' : '' }`;
+        var classes     = 'filters__widget';
+        var iconClasses = 'fa fa-plus';
+        if (this.state.opened) {
+            classes += ' _is-opened';
+            iconClasses = 'fa fa-minus';
+        }
 
         return (
             <div className={classes}>
-                <h4 className="filters__widget__title" onClick={this.onToggleClick}>{this.props.filter.label}</h4>
+                <h4 className="filters__widget__title" onClick={this.onToggleClick}>
+                    {this.props.filter.label}
+                    <span className={iconClasses}/>
+                </h4>
                 <div className="filters__widget__body">
                     <FilterControls filter={this.props.filter}/>
                     {this.props.children}

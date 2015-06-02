@@ -1,4 +1,7 @@
-@require "vars.styl"
+@require 'vars.styl'
+
+$fa-font-path = '../fonts'
+@require './../../node_modules/font-awesome-stylus/stylus/index.styl'
 
 *
   box-sizing: border-box;
@@ -13,14 +16,14 @@ margin 0
 .schema
   margin 20px
 
-@require "vpc.styl"
-@require "subnet.styl"
-@require "autoscaling.styl"
-@require "igw.styl"
-@require "instance.styl"
-@require "volume.styl"
-@require "info-panel.styl"
-@require "filters-panel.styl"
+@require 'vpc.styl'
+@require 'subnet.styl'
+@require 'autoscaling.styl'
+@require 'igw.styl'
+@require 'instance.styl'
+@require 'volume.styl'
+@require 'info-panel.styl'
+@require 'filters-panel.styl'
 
 .lb
   &__link

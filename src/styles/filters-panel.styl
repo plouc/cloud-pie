@@ -3,8 +3,6 @@
   position fixed
   width 20%
   height 100%
-  overflow-x visible
-  overflow-y auto
   left 0
   top 0
   bottom 0
@@ -14,7 +12,7 @@
   font-size 14px
   transform translate3d(-100%, 0, 0)
   -webkit-transition transform 200ms
-  box-shadow 0 0 20px rgba(0, 0, 0, 0.35)
+  box-shadow 0 0 24px rgba(0, 0, 0, 0.35)
 
   &__close
     position absolute
@@ -43,10 +41,17 @@
 .filters
   &__widget
     &__title
+      cursor pointer
       margin 0
       padding 12px 15px
       color #e0c671
       border-bottom 1px solid #0a0c15
+      position relative
+
+      .fa
+        position absolute
+        top   13px
+        right 15px
 
     &__body
       display none
@@ -58,7 +63,7 @@
   &__controls
     font-size 12px
     cursor pointer
-    padding 7px
+    padding 7px 15px
     background #0a0c15
 
     &__control
@@ -77,6 +82,11 @@
     cursor pointer
     color #2c3a47
     border-bottom 1px solid #161d27
+
+    .fa
+      font-size 12px
+      margin-right 7px
+
     &._is-active
       background #202936
       color #b49b55

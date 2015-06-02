@@ -16,13 +16,18 @@ export default React.createClass({
     },
 
     render() {
-        var classes = 'filters__filter';
+        var classes     = 'filters__filter';
+        var iconClasses = 'fa fa-eye-slash';
         if (this.props.filter.active) {
             classes += ' _is-active';
+            iconClasses = 'fa fa-eye';
         }
 
         return (
-            <div className={classes} onClick={this.onClick}>{ this.props.filter.label }</div>
+            <div className={classes} onClick={this.onClick}>
+                <i className={iconClasses}/>
+                { this.props.filter.label }
+            </div>
         );
     }
 });
