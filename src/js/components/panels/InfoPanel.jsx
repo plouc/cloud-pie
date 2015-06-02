@@ -27,8 +27,8 @@ module.exports = InfoPanel = React.createClass({
         this.setState({ opened: opened });
     },
 
-    onCloseClick() {
-        PanelsActions.close('info');
+    onToggleClick() {
+        PanelsActions.toggle('info');
     },
 
     render() {
@@ -39,7 +39,7 @@ module.exports = InfoPanel = React.createClass({
 
         return (
             <div className={classes}>
-                <div className="info-panel__close" onClick={this.onCloseClick}>close</div>
+                <div className="info-panel__close" onClick={this.onToggleClick}>info</div>
                 <ItemInfo/>
             </div>
         );

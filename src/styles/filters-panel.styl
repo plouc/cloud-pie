@@ -3,34 +3,39 @@
   position fixed
   width 20%
   height 100%
-  left -20%
+  left 0
   top 0
   bottom 0
   background $info-panel-background
   z-index 100
   color $info-panel-text-color
   font-size 14px
-
   transform translate3d(-100%, 0, 0)
-
-  -webkit-transition transform 400ms
+  -webkit-transition transform 200ms
 
   &__close
     position absolute
-    top   10px
-    right 15px
+    top   20px
+    right 0
+    width  120px
+    height 32px
     display block
     font-size 12px
-    padding 3px 7px
-    background $info-panel-close-background
-    color      $info-panel-close-text-color
-    border-radius 2px
+    text-align center
+    padding 7px 11px
+    background $panel-close-background
+    color      $panel-close-text-color
+    border-radius 0 0 3px 3px
     cursor pointer
+    transform-origin 100% 0
+    transform rotate(-90deg)
+
     &:hover
-      background $info-panel-background
+      background $panel-close-background-hover
+      color      $panel-close-text-color-hover
 
   &._is-opened
-    transform translate3d(100%, 0, 0)
+    transform translate3d(0, 0, 0)
 
 .filters
   &__title

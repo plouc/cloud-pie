@@ -27,8 +27,8 @@ module.exports = FiltersPanel = React.createClass({
         this.setState({ opened: opened });
     },
 
-    onCloseClick() {
-        PanelsActions.close('filters');
+    onToggleClick() {
+        PanelsActions.toggle('filters');
     },
 
     render() {
@@ -39,7 +39,7 @@ module.exports = FiltersPanel = React.createClass({
 
         return (
             <div className={classes}>
-                <div className="filters-panel__close" onClick={this.onCloseClick}>close</div>
+                <div className="filters-panel__close" onClick={this.onToggleClick}>filters</div>
                 <Filters/>
             </div>
         );
