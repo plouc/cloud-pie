@@ -2,7 +2,8 @@ var Reflux        = require('reflux');
 var PanelsActions = require('./../actions/PanelsActions');
 
 var _panelsState = {
-    info: false
+    info:    false,
+    filters: true
 };
 
 module.exports = ItemStore = Reflux.createStore({

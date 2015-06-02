@@ -14,13 +14,13 @@ module.exports = function (data, clickHandler) {
 
         // Enter
         vpcsNodes.enter().append('g')
+            .attr('transform', d => `translate(${ d.box.origin.x }, 0)`)
             .each(function (d) {
                 var vpc = d3.select(this);
 
                 vpc.append('rect')
                     .attr('class', 'vpc__wrapper')
-                    .attr('width', d.box.width)
-                    .attr('height', d.box.height)
+                    .attr({ width: 10, height: 10 })
                     .attr({ rx: layout.vpc.borderRadius, ry: layout.vpc.borderRadius })
                     .on('click', function (d) {
                         clickHandler('vpc', d);
@@ -64,17 +64,34 @@ module.exports = function (data, clickHandler) {
         // Update
         vpcsNodes
             .attr('class', d => `vpc${ d.active ? ' _is-active' : '' }`)
-            .attr('transform', d => `translate(${ d.box.origin.x }, 0)`)
             .each(function (d) {
                 var _this = d3.select(this);
+
+                _this.select('.vpc__wrapper')
+                    .transition()
+                    .duration(400)
+                    .attr('width', d.box.width)
+                    .attr('height', d.box.height)
+                ;
 
                 if (d.internetGateway !== null) {
                     var igw = d.internetGateway;
                     _this.selectAll('.igw')
                         .attr('class', d => `igw${ igw.active ? ' _is-active' : '' }`)
+                        .transition()
+                        .duration(400)
+                        .attr('transform', `translate(${ d.box.width - 30 - layout.vpc.b.r }, 0)`)
                     ;
                 }
             })
+            .transition()
+            .duration(400)
+            .attr('transform', d => `translate(${ d.box.origin.x }, 0)`)
+        ;
+
+        // Exit
+        vpcsNodes.exit()
+            .remove()
         ;
 
         vpcsNodes.call(Subnets(clickHandler));

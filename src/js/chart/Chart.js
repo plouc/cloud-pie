@@ -196,6 +196,8 @@ module.exports = {
                 });
             });
 
+            vpc.autoscalings = _.filter(vpc.autoscalings, autoscaling => autoscaling.paths.length > 0);
+
             vpc.peerings = {
                 requests: [],
                 accepts:  []
@@ -248,6 +250,8 @@ module.exports = {
                     lb.paths.push(Path.fromBoxes(lb.box, instance.box, 10, 10).points);
                 });
             });
+
+            vpc.loadBalancers = _.filter(vpc.loadBalancers, lb => lb.paths.length > 0);
         });
 
         peerings.forEach(peering => {

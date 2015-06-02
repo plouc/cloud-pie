@@ -1,5 +1,36 @@
-
 var icons = require('./../icons');
+
+var line = d3.svg.line()
+    .x(d => d.x)
+    .y(d => d.y)
+    .interpolate('basis')
+;
+
+var lbPaths = function (d) {
+    var paths = this.selectAll('.lb__link').data(lb => lb.paths);
+
+    // Enter
+    paths.enter().append('path')
+        .attr('class', 'lb__link')
+        .attr('d', line)
+        .style('opacity', 0)
+    ;
+
+    // Update
+    paths
+        .transition()
+        .delay(400)
+        .duration(900)
+        .ease('elastic')
+        .attr('d', line)
+        .style('opacity', 1)
+    ;
+
+    // Exit
+    paths.exit()
+        .remove()
+    ;
+};
 
 module.exports = function (clickHandler) {
     return function () {
@@ -13,31 +44,40 @@ module.exports = function (clickHandler) {
             .each(function (lb) {
                 var lbEl = d3.select(this);
 
-                var line = d3.svg.line()
-                    .x(d => d.x)
-                    .y(d => d.y)
-                    .interpolate('basis')
-                ;
-
-                lb.paths.forEach(path => {
-                    lbEl.append('path').attr('class', 'lb__link').datum(path).attr('d', line);
-                });
-
-                //lb.append('text').text(d => d.name);
+                var bottomAnchor = lb.box.anchor('bottom');
 
                 var icon = lbEl.append('g')
-                    .attr('transform', `translate(${ lb.box.center.x }, ${ lb.box.center.y })`)
+                    .attr('class', 'lb__icon')
+                    .attr('transform', `translate(${ bottomAnchor.x }, ${ bottomAnchor.y }) scale(0)`)
                     .on('click', lb => {
                         clickHandler('lb', lb);
                     })
                 ;
                 icons.loadBalancer(icon);
             })
+            .call(lbPaths)
         ;
 
         // Update
         loadBalancers
             .attr('class', lb => `lb${ lb.active ? ' _is-active' : '' }`)
+            .call(lbPaths)
+            .each(function (lb) {
+                var lbEl = d3.select(this);
+
+                lbEl.select('.lb__icon')
+                    .transition()
+                    .delay(400)
+                    .duration(900)
+                    .ease('elastic')
+                    .attr('transform', `translate(${ lb.box.center.x }, ${ lb.box.center.y }) scale(1)`)
+                ;
+            })
+        ;
+
+        // Exit
+        loadBalancers.exit()
+            .remove()
         ;
     };
 };

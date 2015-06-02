@@ -5,9 +5,10 @@ var _       = require('lodash');
 
 AWS.config.region = 'eu-west-1';
 
-var ec2         = new AWS.EC2();
-var elb         = new AWS.ELB();
-var autoscaling = new AWS.AutoScaling();
+var ec2            = new AWS.EC2();
+var elb            = new AWS.ELB();
+var autoscaling    = new AWS.AutoScaling();
+var cloudFormation = new AWS.CloudFormation();
 
 module.exports.fetch = function () {
     var def  = Promise.defer();
@@ -40,6 +41,32 @@ module.exports.fetch = function () {
         return grouped;
     }
 
+
+    var cfStacksDef = Promise.defer();
+    cloudFormation.describeStacks({}, function (err, data) {
+        if (err) {
+            cfStacksDef.reject(err);
+        } else {
+            console.log(chalk.yellow('- fetched cloud formation stacks'));
+            /* {
+                Parameters: [Object],
+                NotificationARNs: [],
+                Capabilities: [],
+                Outputs: []
+            } */
+            cfStacksDef.resolve(data.Stacks.map(function (stack) {
+                return {
+                    id:              stack.StackId,
+                    name:            stack.StackName,
+                    description:     stack.Description,
+                    createdAt:       stack.CreationTime,
+                    status:          stack.StackStatus,
+                    disableRollback: stack.DisableRollback,
+                    tags:            tagsToObject(stack.Tags)
+                };
+            }));
+        }
+    });
 
     var autoscalingsDef = Promise.defer();
     autoscaling.describeAutoScalingGroups({}, function (err, data) {
@@ -286,7 +313,8 @@ module.exports.fetch = function () {
         vpcPeerings:    vpcPeeringsDef.promise,
         volumes:        volumesDef.promise,
         igws:           igwsDef.promise,
-        autoscalings:   autoscalingsDef.promise
+        autoscalings:   autoscalingsDef.promise,
+        cfStacks:       cfStacksDef.promise
     })
         .then(function (props) {
             ec2.describeImages({
@@ -348,15 +376,16 @@ module.exports.fetch = function () {
                     });
 
                     def.resolve({
-                        vpcs:                props.vpcs,
-                        vpcPeerings:         props.vpcPeerings,
-                        loadBalancers:       props.loadBalancers,
-                        amis:                amis,
-                        vpcTags:             groupResourceTags(props.vpcs),
-                        subnetTags:          groupResourceTags(props.subnets),
-                        instanceTags:        groupResourceTags(props.instances),
-                        volumeTags:          groupResourceTags(props.volumes),
-                        internetGatewayTags: groupResourceTags(props.igws)
+                        vpcs:                 props.vpcs,
+                        vpcPeerings:          props.vpcPeerings,
+                        loadBalancers:        props.loadBalancers,
+                        cloudFormationStacks: props.cfStacks,
+                        amis:                 amis,
+                        vpcTags:              groupResourceTags(props.vpcs),
+                        subnetTags:           groupResourceTags(props.subnets),
+                        instanceTags:         groupResourceTags(props.instances),
+                        volumeTags:           groupResourceTags(props.volumes),
+                        internetGatewayTags:  groupResourceTags(props.igws)
                     });
                 }
             });

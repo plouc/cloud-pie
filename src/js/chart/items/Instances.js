@@ -10,14 +10,15 @@ module.exports = function (clickHandler) {
 
         // Enter
         instances.enter().append('g')
-            .attr('transform', instance => `translate(${ instance.box.origin.x }, ${ instance.box.origin.y })`)
+            .attr('transform', instance => `translate(${ instance.box.center.x }, ${ instance.box.center.y })`)
             .attr('class', 'instance')
+            .style('opacity', 0)
             .each(function (instance) {
                 var instanceEl = d3.select(this);
+
                 var icon = instanceEl.append('rect')
                     .attr('class', 'instance__wrapper')
-                    .attr('width',  instance.box.width)
-                    .attr('height', instance.box.height)
+                    .attr({ width: 1, height: 1 })
                     .attr({ rx: layout.instance.borderRadius, ry: layout.instance.borderRadius })
                 ;
 
@@ -44,6 +45,28 @@ module.exports = function (clickHandler) {
         // Update
         instances
             .attr('class', instance => `instance${ instance.active ? ' _is-active' : '' }`)
+            .each(function (instance, i) {
+                var instanceEl = d3.select(this);
+
+                instanceEl.select('.instance__wrapper')
+                    .transition()
+                    .delay(i * 60 + 400)
+                    .duration(900)
+                    .ease('elastic')
+                    .attr({ width: instance.box.width, height: instance.box.height })
+                ;
+            })
+            .transition()
+            .delay((d, i) => i * 60 + 400)
+            .duration(900)
+            .ease('elastic')
+            .style('opacity', 1)
+            .attr('transform', instance => `translate(${ instance.box.origin.x }, ${ instance.box.origin.y })`)
+        ;
+
+        // Exit
+        instances.exit()
+            .remove()
         ;
 
         instances.call(Volumes(clickHandler));
