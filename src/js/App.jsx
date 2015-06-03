@@ -3,6 +3,7 @@ import ChartWrapper from './components/ChartWrapper.jsx';
 import AwsActions   from './actions/AwsActions';
 import InfoPanel    from './components/panels/InfoPanel.jsx';
 import FiltersPanel from './components/panels/FiltersPanel.jsx';
+import Header       from './components/Header.jsx';
 
 var App = React.createClass({
     displayName: 'App',
@@ -13,6 +14,7 @@ var App = React.createClass({
                 <ChartWrapper/>
                 <FiltersPanel/>
                 <InfoPanel/>
+                <Header/>
             </div>
         );
     }

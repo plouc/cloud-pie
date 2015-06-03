@@ -50,17 +50,20 @@ export default function (data, clickHandler) {
                 var peeringEl = d3.select(this);
                 peeringEl.select('.vpc__peering__path')
                     .datum(peering.points)
-                .transition().duration(400)
+                    .transition()
+                    .duration(400)
                     .attr('d', line)
                 ;
 
                 peeringEl.select('.vpc__peering__icon--req')
-                    .transition().duration(400)
+                    .transition()
+                    .duration(400)
                     .attr('transform', `translate(${ peering.points[0].x }, ${ peering.points[0].y })`)
                 ;
 
                 peeringEl.select('.vpc__peering__icon--acc')
-                    .transition().duration(400)
+                    .transition()
+                    .duration(400)
                     .attr('transform', `translate(${ peering.points[4].x }, ${ peering.points[4].y })`)
                 ;
             })

@@ -10,7 +10,10 @@ export default React.createClass({
         return (
             <div>
                 <h3 className="panel__title">{ data.tags.name || data.id }</h3>
-                <h4 className="item-info__type">EC2 Instance</h4>
+                <h4 className="item-info__type">
+                    EC2 Instance
+                    <span className="fa fa-minus"/>
+                </h4>
                 <Properties properties={{
                     id:           data.id,
                     type:         data.type,
@@ -18,7 +21,10 @@ export default React.createClass({
                     'private ip': data.privateIpAddress || '—',
                     'public ip':  data.publicIpAddress || '—'
                 }}/>
-                <h4 className="item-info__type">Tags</h4>
+                <h4 className="item-info__type">
+                    Tags
+                    <span className="fa fa-minus"/>
+                </h4>
                 <Properties properties={data.tags}/>
             </div>
         );

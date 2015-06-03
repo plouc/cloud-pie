@@ -15,57 +15,17 @@ margin 0
 
 .schema
   margin 20px
+  margin-top $header-height + 20px
 
+@require 'header.styl'
 @require 'vpc.styl'
 @require 'subnet.styl'
 @require 'autoscaling.styl'
+@require 'load-balancer.styl'
 @require 'igw.styl'
 @require 'instance.styl'
 @require 'volume.styl'
 @require 'panel.styl'
+@require 'widget.styl'
 @require 'info-panel.styl'
 @require 'filters.styl'
-
-.lb
-  &__link
-    stroke $lb-link-color
-    stroke-width 2px
-    fill none
-
-  &__icon
-    cursor pointer
-
-    &__background
-      fill $lb-icon-background
-      stroke $lb-icon-border-color
-      stroke-width $lb-icon-border-width
-      -webkit-filter drop-shadow(-5px -5px 5px #000)
-
-    &__symbol
-      fill $lb-icon-symbol-color
-
-  &:hover
-    .lb
-      &__link
-        stroke $lb-link-color-hover
-
-      &__icon
-        &__background
-          fill $lb-icon-background-hover
-          stroke $lb-icon-border-color-hover
-
-        &__symbol
-          fill $lb-icon-symbol-color-hover
-
-  &._is-active
-    .lb
-      &__link
-        stroke $lb-link-color-active
-
-      &__icon
-        &__background
-          fill $lb-icon-background-active
-          stroke $lb-icon-border-color-active
-
-        &__symbol
-          fill $lb-icon-symbol-color-active

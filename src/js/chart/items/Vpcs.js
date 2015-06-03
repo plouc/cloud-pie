@@ -27,7 +27,11 @@ export default function (data, clickHandler) {
                     })
                 ;
 
-                var vpcIcon = vpcEl.append('g').attr('transform', 'translate(36, 30)');
+                var vpcIcon = vpcEl.append('g')
+                    .attr('class', 'vpc__icon')
+                    .attr('transform', 'translate(36, 30)')
+                    .style('opacity', 0)
+                ;
                 icons.vpc(vpcIcon);
                 vpcIcon.append('text')
                     .attr('class', 'vpc__label__text')
@@ -44,7 +48,7 @@ export default function (data, clickHandler) {
                 if (vpc.internetGateway !== null) {
                     var igwGroup = vpcEl.append('g')
                         .attr('class', 'igw')
-                        .attr('transform', `translate(${ vpc.box.width - 30 - layout.vpc.b.r }, 0)`)
+                        .attr('transform', `translate(${ vpc.box.width - 30 - layout.vpc.b.r }, 0) scale(0)`)
                     ;
                     icons.igw(igwGroup);
                     igwGroup.append('text')
@@ -70,8 +74,13 @@ export default function (data, clickHandler) {
                 vpcEl.select('.vpc__wrapper')
                     .transition()
                     .duration(400)
-                    .attr('width', vpc.box.width)
-                    .attr('height', vpc.box.height)
+                    .attr({ width: vpc.box.width, height: vpc.box.height })
+                ;
+
+                vpcEl.select('.vpc__icon')
+                    .transition()
+                    .duration(400)
+                    .style('opacity', 1)
                 ;
 
                 if (vpc.internetGateway !== null) {
@@ -80,7 +89,7 @@ export default function (data, clickHandler) {
                         .attr('class', `igw${ igw.active ? ' _is-active' : '' }`)
                         .transition()
                         .duration(400)
-                        .attr('transform', `translate(${ vpc.box.width - 30 - layout.vpc.b.r }, 0)`)
+                        .attr('transform', `translate(${ vpc.box.width - 30 - layout.vpc.b.r }, 0) scale(1)`)
                     ;
                 }
             })
@@ -91,6 +100,31 @@ export default function (data, clickHandler) {
 
         // Exit
         vpcsNodes.exit()
+            .each(function (vpc) {
+                var vpcEl = d3.select(this);
+
+                vpcEl.select('.vpc__wrapper')
+                    .transition()
+                    .duration(200)
+                    .attr({ width: 10, height: 10 })
+                ;
+
+                vpcEl.select('.vpc__icon')
+                    .transition()
+                    .duration(200)
+                    .style('opacity', 0)
+                ;
+
+                if (vpc.internetGateway !== null) {
+                    vpcEl.selectAll('.igw')
+                        .transition()
+                        .duration(200)
+                        .attr('transform', `translate(${ vpc.box.width - 30 - layout.vpc.b.r }, 0) scale(0)`)
+                    ;
+                }
+            })
+            .transition()
+            .duration(300)
             .remove()
         ;
 
