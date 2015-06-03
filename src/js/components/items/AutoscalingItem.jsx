@@ -9,7 +9,7 @@ export default React.createClass({
 
         return (
             <div>
-                <h3 className="item-info__id">{ data.name || data.id }</h3>
+                <h3 className="panel__title">{ data.name || data.id }</h3>
                 <h4 className="item-info__type">Autoscaling Group</h4>
                 <Properties properties={{
                     'min size': data.minSize,

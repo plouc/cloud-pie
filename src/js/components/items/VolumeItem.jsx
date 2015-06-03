@@ -10,7 +10,7 @@ export default React.createClass({
 
         return (
             <div>
-                <h3 className="item-info__id">{ data.deviceName }</h3>
+                <h3 className="panel__title">{ data.deviceName }</h3>
                 <h4 className="item-info__type">volume</h4>
                 <Properties properties={{
                     'device name': data.deviceName,

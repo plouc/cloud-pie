@@ -1,22 +1,60 @@
 $main-background = #202936
 
 
+//###########//
+//   panel   //
+//###########//
+$panel-text-color             = #5a6c86
+$panel-background             = #161d27
+$panel-close-background       = #2b343e
+$panel-close-text-color       = #0f141e
+$panel-close-background-hover = #5a6c86
+$panel-close-text-color-hover = #0f141e
+$panel-open-background        = #2b343e
+$panel-open-text-color        = #b49b55
+$panel-open-background-hover  = #1c232d
+$panel-open-text-color-hover  = #eed47c
+
+
 //################//
 //   info panel   //
 //################//
-
 $item-info-id-text-color          = #e0c671
 $item-info-type-text-color        = #506079
 $item-info-type-background        = #202936
-$item-info-props-key-text-color   = #3c4a60
-$item-info-props-value-text-color = #b49b55
+$item-info-props-key-text-color   = darken($panel-text-color, 20)
+$item-info-props-value-text-color = #6c819b
 
-$panel-text-color             = #3c4a60
-$panel-background             = #161d27
-$panel-close-background       = #161d27
-$panel-close-text-color       = #b49b55
-$panel-close-background-hover = #1c232d
-$panel-close-text-color-hover = #eed47c
+
+
+//#############//
+//   filters   //
+//#############//
+$filters-separator-color                      = #0f141e
+
+$filters-title-text-color                     = #b49b55
+$filters-title-background-hover               = #1c232e
+
+$filter-text-color-active                     = #6c819b
+$filter-text-color-inactive                   = darken($panel-text-color, 20)
+$filter-background-hover                      = #1c232e
+
+$filter-indicator-color-inactive              = transparent
+$filter-indicator-color-active                = $panel-text-color
+$filter-indicator-color-hover                 = darken($panel-text-color, 12)
+
+$filters-controls-text-color                  = darken($panel-text-color, 9)
+$filters-controls-background                  = #0f141e
+$filters-control-border-color                 = darken($panel-text-color, 16)
+
+$filters-controls-state-background-enabled    = #b49b55
+$filters-controls-state-border-color-enabled  = $filters-controls-state-background-enabled
+$filters-controls-state-text-color-enabled    = #0f141e
+
+$filters-controls-state-background-disabled   = darken($panel-text-color, 7)
+$filters-controls-state-border-color-disabled = $filters-controls-state-background-disabled
+$filters-controls-state-text-color-disabled   = #0f141e
+
 
 //#########//
 //   igw   //

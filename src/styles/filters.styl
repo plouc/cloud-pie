@@ -1,20 +1,28 @@
 .filters
   &__widget
+    border-bottom 1px solid $filters-separator-color
+    &:last-child
+      border-bottom none
+
     &__title
       cursor pointer
       margin 0
-      padding 12px 15px
-      color #e0c671
-      border-bottom 1px solid #0a0c15
+      padding 17px 20px
       position relative
+      font-weight 300
+      font-size 15px
+      color $filters-title-text-color
+      &:hover
+        background $filters-title-background-hover
 
       .fa
         position absolute
-        top   13px
-        right 15px
+        top   18px
+        right 30px
 
     &__body
       display none
+      padding-bottom 20px
 
     &._is-opened
       .filters__widget__body
@@ -22,31 +30,76 @@
 
   &__controls
     font-size 12px
-    cursor pointer
-    padding 7px 15px
-    background #0a0c15
+    padding 9px 20px
+    color      $filters-controls-text-color
+    background $filters-controls-background
 
-    &__control
-      display inline-block
-      padding 4px 8px
-      background #202936
-      color #697d99
-      border-radius 2px
-      margin-left 7px
-      &:first-child
-        margin-left 0
+  &__control,
+  &__controls__state,
+  &__controls__text
+    display inline-block
+    margin-left 9px
+    &:first-child
+      margin-left 0
+
+  &__controls__text
+    margin-left 15px
+
+  &__control,
+  &__controls__state
+    border-radius 2px
+    padding 3px 7px
+    border 1px solid #000
+
+  &__control
+    cursor pointer
+    color $filters-controls-text-color
+    border-color $filters-control-border-color
+    font-weight 700
+    
+  &__controls__state
+    padding-left 5px
+    &--enabled
+      background   $filters-controls-state-background-enabled
+      border-color $filters-controls-state-border-color-enabled
+      color        $filters-controls-state-text-color-enabled
+    &--disabled
+      background   $filters-controls-state-background-disabled
+      border-color $filters-controls-state-border-color-disabled
+      color        $filters-controls-state-text-color-disabled
+    .fa
+      margin-right 5px
 
   &__filter
+    font-size 13px
+    font-weight 700
     display block
-    padding 7px 15px
+    padding 11px 20px 11px 20px
     cursor pointer
-    color #2c3a47
-    border-bottom 1px solid #161d27
+    color $filter-text-color-inactive
+    position relative
+
+    &:before
+      content ' '
+      position absolute
+      top    0
+      bottom 0
+      left   0
+      width 5px
+      background $filter-indicator-color-inactive
+
+    &:hover
+      background $filter-background-hover
+      &:before
+        background $filter-indicator-color-hover
 
     .fa
-      font-size 12px
-      margin-right 7px
+      font-size 14px
+      margin-right 12px
+
 
     &._is-active
-      background #202936
-      color #b49b55
+      color $filter-text-color-active
+
+      &:before
+        background $filter-indicator-color-active

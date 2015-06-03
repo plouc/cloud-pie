@@ -9,7 +9,7 @@ export default React.createClass({
 
         return (
             <div>
-                <h3 className="item-info__id">{ data.name }</h3>
+                <h3 className="panel__title">{ data.name }</h3>
                 <h4 className="item-info__type">ELB</h4>
                 <Properties properties={{
                     'dns name':   data.dnsName,

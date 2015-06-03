@@ -9,7 +9,7 @@ export default React.createClass({
 
         return (
             <div>
-                <h3 className="item-info__id">{ data.id }</h3>
+                <h3 className="panel__title">{ data.id }</h3>
                 <h4 className="item-info__type">IGW</h4>
             </div>
         );

@@ -29,8 +29,12 @@ export default React.createClass({
         this.setState({ opened: opened });
     },
 
-    onToggleClick() {
-        PanelsActions.toggle('filters');
+    onOpenClick() {
+        PanelsActions.open('filters');
+    },
+
+    onCloseClick() {
+        PanelsActions.close('filters');
     },
 
     render() {
@@ -40,9 +44,17 @@ export default React.createClass({
         }
 
         return (
-            <div className={classes}>
-                <div className="panel__close" onClick={this.onToggleClick}>filters</div>
-                <Filters/>
+            <div>
+                <div className="panel__open panel__open--left" onClick={this.onOpenClick}>
+                    <i className="fa fa-filter"/>
+                </div>
+                <div className={classes}>
+                    <h3 className="panel__title">Filters</h3>
+                    <div className="panel__close panel__close--left" onClick={this.onCloseClick}>
+                        <i className="fa fa-times"/>
+                    </div>
+                    <Filters/>
+                </div>
             </div>
         );
     }

@@ -23,18 +23,32 @@ export default React.createClass({
     },
 
     render() {
-        var activeNode;
+        var activeNode, statusNode;
         if (this.props.filter.active) {
-            activeNode = <span className="filters__controls__control" onClick={this.onToggleClick}>disable</span>;
+            statusNode = (
+                <span className="filters__controls__state filters__controls__state--enabled">
+                    <i className="fa fa-dot-circle-o"/>
+                    enabled
+                </span>
+            );
+            activeNode = <span className="filters__control" onClick={this.onToggleClick}>disable</span>;
         } else {
-            activeNode = <span className="filters__controls__control" onClick={this.onToggleClick}>enable</span>;
+            statusNode = (
+                <span className="filters__controls__state filters__controls__state--disabled">
+                    <i className="fa fa-circle-o"/>
+                    disabled
+                </span>
+            );
+            activeNode = <span className="filters__control" onClick={this.onToggleClick}>enable</span>;
         }
 
         return (
             <div className="filters__controls">
+                {statusNode}
                 {activeNode}
-                <span className="filters__controls__control" onClick={this.onSelectNoneClick}>none</span>
-                <span className="filters__controls__control" onClick={this.onSelectAllClick}>all</span>
+                <span className="filters__controls__text">select:</span>
+                <span className="filters__control filters__control--select-all" onClick={this.onSelectAllClick}>all</span>
+                <span className="filters__control filters__control--select-none" onClick={this.onSelectNoneClick}>none</span>
             </div>
         );
     }

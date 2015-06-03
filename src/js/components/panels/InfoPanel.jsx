@@ -29,8 +29,12 @@ export default React.createClass({
         this.setState({ opened: opened });
     },
 
-    onToggleClick() {
-        PanelsActions.toggle('info');
+    onOpenClick() {
+        PanelsActions.open('info');
+    },
+
+    onCloseClick() {
+        PanelsActions.close('info');
     },
 
     render() {
@@ -40,9 +44,16 @@ export default React.createClass({
         }
 
         return (
-            <div className={classes}>
-                <div className="panel__close" onClick={this.onToggleClick}>info</div>
-                <ItemInfo/>
+            <div>
+                <div className="panel__open panel__open--right" onClick={this.onOpenClick}>
+                    <i className="fa fa-info"/>
+                </div>
+                <div className={classes}>
+                    <div className="panel__close panel__close--right" onClick={this.onCloseClick}>
+                        <i className="fa fa-times"/>
+                    </div>
+                    <ItemInfo/>
+                </div>
             </div>
         );
     }

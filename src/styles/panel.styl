@@ -1,7 +1,8 @@
 .panel
+  font-family "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif
   display block
   position fixed
-  width 20%
+  width 25%
   height 100%
   top    0
   bottom 0
@@ -12,22 +13,53 @@
   -webkit-transition transform 200ms
   box-shadow 0 0 24px rgba(0, 0, 0, 0.35)
 
+  &__title
+    margin 0
+    padding 20px 20px 15px 20px
+    font-weight 400
+
   &__close
+    font-size 12px
+    cursor pointer
     position absolute
-    width  120px
+    top   15px
+    right 22px
+    border-radius 16px
+    width  32px
     height 32px
     display block
-    font-size 12px
     text-align center
-    padding 7px 11px
+    padding-top 9px
     background $panel-close-background
     color      $panel-close-text-color
-    cursor pointer
-    transform rotate(-90deg)
-
     &:hover
       background $panel-close-background-hover
       color      $panel-close-text-color-hover
+
+  &__open
+    position fixed
+    top 20px
+    width  52px
+    height 52px
+    border-radius 26px
+    display block
+    text-align center
+    padding-top 16px
+    font-size 18px
+    background $panel-open-background
+    color      $panel-open-text-color
+    cursor pointer
+    box-shadow 0 1px 2px rgba(0, 0, 0, 0.5)
+    &--right
+      right 20px
+
+    &--left
+      left 20px
+
+    &:hover
+      box-shadow none
+      background $panel-open-background-hover
+      color      $panel-open-text-color-hover
 
   &._is-opened
     transform translate3d(0, 0, 0)
@@ -36,18 +68,6 @@
     right 0
     transform translate3d(100%, 0, 0)
 
-    .panel__close
-      top  108px
-      left 0
-      border-radius 2px
-      transform-origin 0 100%
-
   &--left
     left 0
     transform translate3d(-100%, 0, 0)
-
-    .panel__close
-      top   20px
-      right 0
-      transform-origin 100% 0
-      border-radius 0 0 3px 3px

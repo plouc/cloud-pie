@@ -9,7 +9,7 @@ export default React.createClass({
 
         return (
             <div>
-                <h3 className="item-info__id">{ data.tags.name || data.id }</h3>
+                <h3 className="panel__title">{ data.tags.name || data.id }</h3>
                 <h4 className="item-info__type">VPC</h4>
                 <Properties properties={{
                     id:        data.id,
