@@ -32,6 +32,6 @@ gulp
 node server.js
 ```
 
-you can now open your browser at `http://localhost:3000`.
+you can now open your browser at http://localhost:3000.
 
 
