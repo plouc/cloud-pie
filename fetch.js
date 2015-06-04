@@ -1,5 +1,5 @@
 var fs    = require('fs');
-var stack = require('./server/lib/stack');
+var stack = require('./server/lib/aws/stack');
 var chalk = require('chalk');
 
 var filePath = 'dist/aws.json';
