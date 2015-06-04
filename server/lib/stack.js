@@ -2,71 +2,19 @@ var Promise = require('bluebird');
 var AWS     = require('aws-sdk');
 var chalk   = require('chalk');
 var _       = require('lodash');
+var utils   = require('./utils');
 
 AWS.config.region = 'eu-west-1';
+
+var route53        = require('./route53');
+var cloudFormation = require('./cloudFormation');
 
 var ec2            = new AWS.EC2();
 var elb            = new AWS.ELB();
 var autoscaling    = new AWS.AutoScaling();
-var cloudFormation = new AWS.CloudFormation();
 
 module.exports.fetch = function () {
-    var def  = Promise.defer();
-
-    function tagsToObject(tagsArray) {
-        var tags = {};
-        tagsArray.forEach(function (tag) {
-            tags[tag.Key.toLowerCase()] = tag.Value;
-        });
-
-        return tags;
-    }
-
-    function groupResourceTags(resources) {
-        var grouped = [];
-
-        resources.forEach(function (resource) {
-            _.forOwn(resource.tags, function (tagValue, tagKey) {
-                if (!_.find(grouped, { key: tagKey })) {
-                    grouped.push({ key: tagKey, values: [] });
-                }
-                _.find(grouped, { key: tagKey }).values.push(tagValue);
-            });
-        });
-
-        grouped.forEach(function (tag) {
-            tag.values = _.uniq(tag.values);
-        });
-
-        return grouped;
-    }
-
-
-    var cfStacksDef = Promise.defer();
-    cloudFormation.describeStacks({}, function (err, data) {
-        if (err) {
-            cfStacksDef.reject(err);
-        } else {
-            console.log(chalk.yellow('- fetched cloud formation stacks'));
-            /* {
-                Parameters: [Object],
-                NotificationARNs: [],
-                Capabilities: [],
-                Outputs: []
-            } */
-            cfStacksDef.resolve(data.Stacks.map(function (stack) {
-                return {
-                    id:              stack.StackId,
-                    name:            stack.StackName,
-                    description:     stack.Description,
-                    createdAt:       stack.CreationTime,
-                    status:          stack.StackStatus,
-                    disableRollback: stack.DisableRollback,
-                    tags:            tagsToObject(stack.Tags)
-                };
-            }));
-        }
-    });
+    var def = Promise.defer();
 
     var autoscalingsDef = Promise.defer();
     autoscaling.describeAutoScalingGroups({}, function (err, data) {
@@ -115,7 +63,7 @@ module.exports.fetch = function () {
                     zone:                subnet.AvailabilityZone,
                     azDefault:           subnet.DefaultForAz,
                     mapPublicIpOnLaunch: subnet.MapPublicIpOnLaunch,
-                    tags:                tagsToObject(subnet.Tags),
+                    tags:                utils.tagsToObject(subnet.Tags),
                     instances:           [],
                     loadBalancers:       []
                 };
@@ -133,7 +81,7 @@ module.exports.fetch = function () {
             igwsDef.resolve(data.InternetGateways.map(function (igw) {
                 return {
                     id:          igw.InternetGatewayId,
-                    tags:        tagsToObject(igw.Tags),
+                    tags:        utils.tagsToObject(igw.Tags),
                     attachments: igw.Attachments.map(function (attachment) {
                         return {
                             vpcId: attachment.VpcId,
@@ -163,7 +111,7 @@ module.exports.fetch = function () {
                     createdAt:        volume.CreateTime,
                     type:             volume.VolumeType,
                     encrypted:        volume.Encrypted,
-                    tags:             tagsToObject(volume.Tags)
+                    tags:             utils.tagsToObject(volume.Tags)
                 };
             }));
         }
@@ -183,7 +131,7 @@ module.exports.fetch = function () {
                     cidrBlock:       vpc.CidrBlock,
                     dhcpOptionsId:   vpc.DhcpOptionsId,
                     instanceTenancy: vpc.InstanceTenancy,
-                    tags:            tagsToObject(vpc.Tags),
+                    tags:            utils.tagsToObject(vpc.Tags),
                     isDefault:       vpc.IsDefault,
                     subnets:         [],
                     autoscalings:    [],
@@ -205,7 +153,7 @@ module.exports.fetch = function () {
                 return {
                     id:               pc.VpcPeeringConnectionId,
                     status:           pc.Status.Message,
-                    tags:             tagsToObject(pc.Tags),
+                    tags:             utils.tagsToObject(pc.Tags),
                     requesterVpcInfo: {
                         cidrBlock: pc.RequesterVpcInfo.CidrBlock,
                         ownerId:   pc.RequesterVpcInfo.OwnerId,
@@ -254,7 +202,7 @@ module.exports.fetch = function () {
                         publicIpAddress:     instance.PublicIpAddress || null,
                         vpcId:               instance.VpcId,
                         subnetId:            instance.SubnetId,
-                        tags:                tagsToObject(instance.Tags),
+                        tags:                utils.tagsToObject(instance.Tags),
                         blockDeviceMappings: blockDeviceMappings,
                         loadBalancers:       [],
                         securityGroupsIds:   _.pluck(instance.SecurityGroups, 'GroupId'),
@@ -314,7 +262,7 @@ module.exports.fetch = function () {
         volumes:        volumesDef.promise,
         igws:           igwsDef.promise,
         autoscalings:   autoscalingsDef.promise,
-        cfStacks:       cfStacksDef.promise
+        cfStacks:       cloudFormation.stacks(),
     })
         .then(function (props) {
             ec2.describeImages({
@@ -381,11 +329,11 @@ module.exports.fetch = function () {
                         loadBalancers:        props.loadBalancers,
                         cloudFormationStacks: props.cfStacks,
                         amis:                 amis,
-                        vpcTags:              groupResourceTags(props.vpcs),
-                        subnetTags:           groupResourceTags(props.subnets),
-                        instanceTags:         groupResourceTags(props.instances),
-                        volumeTags:           groupResourceTags(props.volumes),
-                        internetGatewayTags:  groupResourceTags(props.igws)
+                        vpcTags:              utils.groupResourceTags(props.vpcs),
+                        subnetTags:           utils.groupResourceTags(props.subnets),
+                        instanceTags:         utils.groupResourceTags(props.instances),
+                        volumeTags:           utils.groupResourceTags(props.volumes),
+                        internetGatewayTags:  utils.groupResourceTags(props.igws)
                     });
                 }
             });

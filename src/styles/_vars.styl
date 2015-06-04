@@ -1,38 +1,38 @@
-$main-background = #eaeaea
+$main-background = #202936
 
 
 $header-height               = 52px
-$header-background           = #1da9d4
-$header-brand-text-color     = #fff
-$header-brand-pie-text-color = #64cde8
+$header-background           = #2d3746
+$header-brand-text-color     = #eed47c
+$header-brand-pie-text-color = #b49b55
 
 
 //###########//
 //   panel   //
 //###########//
-$panel-text-color             = #555
-$panel-background             = #fff
-$panel-close-background       = #1da9d4
-$panel-close-text-color       = #fff
-$panel-close-background-hover = #64cde8
-$panel-close-text-color-hover = #fff
-$panel-open-background        = #1da9d4
-$panel-open-text-color        = #fff
-$panel-open-background-hover  = #64cde8
-$panel-open-text-color-hover  = #fff
+$panel-text-color             = #5a6c86
+$panel-background             = #161d27
+$panel-close-background       = #2b343e
+$panel-close-text-color       = #0f141e
+$panel-close-background-hover = #5a6c86
+$panel-close-text-color-hover = #0f141e
+$panel-open-background        = #b49b55
+$panel-open-text-color        = #2b343e
+$panel-open-background-hover  = #eed47c
+$panel-open-text-color-hover  = #1c232d
 
 
 //############//
 //   widget   //
 //############//
-$widget-title-text-color       = #000
+$widget-title-text-color       = #b49b55
 $widget-title-background-hover = #1c232e
 
 
 //################//
 //   info panel   //
 //################//
-$item-info-id-text-color          = #1da9d4
+$item-info-id-text-color          = #e0c671
 $item-info-type-text-color        = #506079
 $item-info-type-background        = #202936
 $item-info-props-key-text-color   = darken($panel-text-color, 20)
@@ -43,42 +43,42 @@ $item-info-props-value-text-color = #6c819b
 //#############//
 //   filters   //
 //#############//
-$filters-separator-color                      = #ddd
+$filters-separator-color                      = #0f141e
 
-$filters-title-text-color                     = #1da9d4
-$filters-title-background-hover               = #eee
+$filters-title-text-color                     = #b49b55
+$filters-title-background-hover               = #1c232e
 
-$filter-text-color-active                     = #333
-$filter-text-color-inactive                   = #bbb
-$filter-background-hover                      = #eee
+$filter-text-color-active                     = #6c819b
+$filter-text-color-inactive                   = darken($panel-text-color, 20)
+$filter-background-hover                      = #1c232e
 
 $filter-indicator-color-inactive              = transparent
-$filter-indicator-color-active                = #1da9d4
-$filter-indicator-color-hover                 = #64cde8
+$filter-indicator-color-active                = $panel-text-color
+$filter-indicator-color-hover                 = darken($panel-text-color, 12)
 
 $filters-controls-text-color                  = darken($panel-text-color, 9)
-$filters-controls-background                  = #fff
+$filters-controls-background                  = #0f141e
 $filters-control-border-color                 = darken($panel-text-color, 16)
 
-$filters-controls-state-background-enabled    = #46b94c
+$filters-controls-state-background-enabled    = #b49b55
 $filters-controls-state-border-color-enabled  = $filters-controls-state-background-enabled
-$filters-controls-state-text-color-enabled    = #fff
+$filters-controls-state-text-color-enabled    = #0f141e
 
-$filters-controls-state-background-disabled   = #ccc
+$filters-controls-state-background-disabled   = darken($panel-text-color, 7)
 $filters-controls-state-border-color-disabled = $filters-controls-state-background-disabled
-$filters-controls-state-text-color-disabled   = #eee
+$filters-controls-state-text-color-disabled   = #0f141e
 
 
 //#########//
 //   igw   //
 //#########//
-$igw-text-color             = #1da9d4
-$igw-icon-background        = $igw-text-color
-$igw-icon-symbol            = #64cde8
+$igw-text-color             = #2d6b8f
+$igw-icon-background        = #2d6b8f
+$igw-icon-symbol            = #202936
 // igw active
-$igw-text-color-active      = $igw-text-color
-$igw-icon-background-active = $igw-text-color
-$igw-icon-symbol-active     = #fff
+$igw-text-color-active      = #1d92bb
+$igw-icon-background-active = #1d92bb
+$igw-icon-symbol-active     = #161d27
 
 
 //#########//
@@ -91,20 +91,20 @@ $vpc-icon-left           = #b49b55
 $vpc-icon-top            = #e6d395
 $vpc-icon-bottom         = #8d7947
 // vpc -> area
-$vpc-background          = #fff
-$vpc-border-color        = #ddd
+$vpc-background          = #2b3847
+$vpc-border-color        = #161d27
 $vpc-border-width        = 2px
 // vpc -> active
 $vpc-text-color-active   = #e6d395
-$vpc-background-active   = #fff
-$vpc-border-color-active = #1da9d4
+$vpc-background-active   = #2b3847
+$vpc-border-color-active = #4a5d75
 
 
 //#################//
 //   VPC peering   //
 //#################//
-$vpc-peering-link-color        = #96d1de
-$vpc-peering-link-color-active = #1da9d4
+$vpc-peering-link-color        = #3e4c61
+$vpc-peering-link-color-active = #1d92bb
 
 
 //###################//
@@ -154,22 +154,22 @@ $autoscaling-icon-border-color-active = #73c79d
 //   subnet   //
 //############//
 $subnet-text-color          = #3092b5
-$subnet-background          = #eee
-$subnet-border-color        = #ddd
+$subnet-background          = #323f53
+$subnet-border-color        = #253246
 $subnet-border-width        = 2px
 // subnet -> active
 $subnet-text-color-active   = #2daad4
-$subnet-background-active   = #eee
-$subnet-border-color-active = #2f9cc0
+$subnet-background-active   = #323f53
+$subnet-border-color-active = #161d27
 
 
 //##############//
 //   instance   //
 //##############//
-$instance-background          = #fff
+$instance-background          = #1e2836
 $instance-border-width        = 1px
-$instance-border-color        = #ddd
-$instance-text-color          = #555
+$instance-border-color        = #1e2836
+$instance-text-color          = #eedba5
 // instance -> hover
 $instance-background-hover    = #273141
 $instance-border-color-hover  = #273141
@@ -177,12 +177,12 @@ $instance-border-color-hover  = #273141
 $instance-background-active   = #161d27
 $instance-border-color-active = #090d12
 
-$instance-state-stopped-color = #d23e2a
-$instance-state-running-color = #46b94c
+$instance-state-stopped-color = #c4483f
+$instance-state-running-color = #52bcb5
 
 // volume
-$volume-background        = #ddd
-$volume-text-color        = #1d92bb
+$volume-background        = #2d6b8f
+$volume-text-color        = #1e2836
 // volume -> hover
 $volume-background-hover  = #1d92bb
 $volume-text-hover        = #1e2836
