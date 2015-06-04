@@ -26,16 +26,12 @@ generate:
 gulp
 ```
 
-## Serve generated content
-
-you can now serve what's inside `/dist` directory, you can use `http-server` package:
+## Start server
 
 ```sh
-npm install -g http-server
-cd dist
-http-server
+node server.js
 ```
 
-you can now open your browser at `http://localhost:8080`.
+you can now open your browser at `http://localhost:3000`.
 
 
