@@ -1,3 +1,5 @@
+'use strict';
+
 var Promise = require('bluebird');
 var AWS     = require('aws-sdk');
 var chalk   = require('chalk');
