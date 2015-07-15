@@ -93,7 +93,7 @@ export default Reflux.createStore({
      * Fetch aws data dump.
      */
     fetch() {
-        request.get('/aws.json').end((err, res) => {
+        request.get('aws.json').end((err, res) => {
             if (err) { throw err; }
 
             currentStack = res.body;
